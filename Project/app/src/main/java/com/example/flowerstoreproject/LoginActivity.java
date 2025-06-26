@@ -3,6 +3,7 @@ package com.example.flowerstoreproject;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -15,6 +16,7 @@ import com.example.flowerstoreproject.api.AuthService;
 import com.example.flowerstoreproject.api.RetrofitClient;
 import com.example.flowerstoreproject.model.LoginRequest;
 import com.example.flowerstoreproject.model.LoginResponse;
+import org.json.JSONObject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,7 +24,7 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private EditText etEmail, etPassword;
-    private LinearLayout btnLogin; // Đổi từ Button thành LinearLayout
+    private LinearLayout btnLogin;
     private TextView tvRegister;
     private ProgressBar progressBar;
     private AuthService authService;
@@ -35,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin); // ID không đổi, nhưng kiểu là LinearLayout
+        btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegister);
         progressBar = findViewById(R.id.progressBar);
 
@@ -85,17 +87,40 @@ public class LoginActivity extends AppCompatActivity {
                     LoginResponse loginResponse = response.body();
                     Log.d(TAG, "Login successful: " + loginResponse.getEmail());
 
+                    // Decode JWT token to extract role
+                    String role = ""; // Default role if decoding fails or role not found
+                    String token = loginResponse.getToken();
+                    if (token != null && !token.isEmpty()) {
+                        try {
+                            // Split JWT token and decode payload
+                            String[] parts = token.split("\\.");
+                            if (parts.length == 3) {
+                                String payload = new String(Base64.decode(parts[1], Base64.URL_SAFE));
+                                JSONObject payloadJson = new JSONObject(payload);
+                                role = payloadJson.optString("role", "Guest");
+                                Log.d(TAG, "Extracted role: " + role);
+                            } else {
+                                Log.e(TAG, "Invalid JWT token format");
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error decoding JWT token: ", e);
+                        }
+                    } else {
+                        Log.e(TAG, "Token is null or empty");
+                    }
+
                     // Save user data to SharedPreferences
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("user_id", loginResponse.getId());
                     editor.putString("full_name", loginResponse.getFullName() != null ? loginResponse.getFullName() : "Guest");
                     editor.putString("email", loginResponse.getEmail());
                     editor.putString("phone", loginResponse.getPhone());
-                    editor.putString("token", loginResponse.getToken());
+                    editor.putString("token", token);
+                    editor.putString("role", role);
                     editor.apply();
 
                     // Show success message and navigate to MainActivity
-                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Login Successful! Role: " + role, Toast.LENGTH_SHORT).show();
                     try {
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
