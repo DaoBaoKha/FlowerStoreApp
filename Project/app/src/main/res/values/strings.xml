@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">FlowerStoreProject</string>
+    <string name="app_name">Flower Shop</string>
+    <string name="welcome">Welcome to Flower Shop!</string>
 </resources>
