@@ -32,6 +32,8 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private AuthService authService;
     private SharedPreferences sharedPreferences;
+    private static final int MAX_RETRIES = 3;
+    private int retryCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,100 +78,92 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setEnabled(false);
         Log.d(TAG, "ProgressBar shown, btnLogin disabled, sending login request");
 
+        performLoginWithRetry(email, password);
+    }
+
+    private void performLoginWithRetry(String email, String password) {
         LoginRequest loginRequest = new LoginRequest(email, password);
         Call<LoginResponse> call = authService.login(loginRequest);
         Log.d(TAG, "Login request created with payload: " + loginRequest.toString());
 
-        final android.os.Handler handler = new android.os.Handler();
-        handler.postDelayed(() -> {
-            if (progressBar.getVisibility() == View.VISIBLE) {
-                progressBar.setVisibility(View.GONE);
-                btnLogin.setEnabled(true);
-                Log.e(TAG, "Request timed out after 35 seconds (manual override)");
-                Toast.makeText(LoginActivity.this, "Login timed out, please try again", Toast.LENGTH_SHORT).show();
-            }
-        }, 35000);
-
         call.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                handler.removeCallbacksAndMessages(null);
                 progressBar.setVisibility(View.GONE);
                 btnLogin.setEnabled(true);
                 Log.d(TAG, "Received response, code: " + response.code());
-                try {
-                    if (response.isSuccessful() && response.body() != null) {
-                        LoginResponse loginResponse = response.body();
-                        String role = loginResponse.getRole(); // Lấy role từ JSON
-                        Log.d(TAG, "Login successful: Email=" + loginResponse.getEmail() +
-                                ", FullName=" + loginResponse.getFullName() +
-                                ", Token=" + loginResponse.getToken() +
-                                ", Role=" + role);
+                if (response.isSuccessful() && response.body() != null) {
+                    LoginResponse loginResponse = response.body();
+                    String role = loginResponse.getRole(); // Lấy role từ JSON
+                    Log.d(TAG, "Login successful: Email=" + loginResponse.getEmail() +
+                            ", FullName=" + loginResponse.getFullName() +
+                            ", Token=" + loginResponse.getToken() +
+                            ", Role=" + role);
 
-                        // Decode JWT token to verify role (optional)
-                        String token = loginResponse.getToken();
-                        if (token != null && !token.isEmpty()) {
-                            try {
-                                String[] parts = token.split("\\.");
-                                if (parts.length == 3) {
-                                    String payload = new String(Base64.decode(parts[1], Base64.URL_SAFE));
-                                    JSONObject payloadJson = new JSONObject(payload);
-                                    String jwtRole = payloadJson.optString("role", role);
-                                    if (!jwtRole.equals(role)) {
-                                        Log.w(TAG, "Role mismatch: JSON=" + role + ", JWT=" + jwtRole);
-                                    }
-                                    Log.d(TAG, "Decoded role from JWT: " + jwtRole);
-                                } else {
-                                    Log.e(TAG, "Invalid JWT token format, parts length: " + parts.length);
+                    // Decode JWT token to verify role (optional)
+                    String token = loginResponse.getToken();
+                    if (token != null && !token.isEmpty()) {
+                        try {
+                            String[] parts = token.split("\\.");
+                            if (parts.length == 3) {
+                                String payload = new String(Base64.decode(parts[1], Base64.URL_SAFE));
+                                JSONObject payloadJson = new JSONObject(payload);
+                                String jwtRole = payloadJson.optString("role", role);
+                                if (!jwtRole.equals(role)) {
+                                    Log.w(TAG, "Role mismatch: JSON=" + role + ", JWT=" + jwtRole);
                                 }
-                            } catch (Exception e) {
-                                Log.e(TAG, "Error decoding JWT token: ", e);
+                                Log.d(TAG, "Decoded role from JWT: " + jwtRole);
+                            } else {
+                                Log.e(TAG, "Invalid JWT token format, parts length: " + parts.length);
                             }
-                        } else {
-                            Log.e(TAG, "Token is null or empty");
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error decoding JWT token: ", e);
                         }
-
-                        // Save user data to SharedPreferences
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("user_id", loginResponse.getId());
-                        editor.putString("full_name", loginResponse.getFullName() != null ? loginResponse.getFullName() : "Guest");
-                        editor.putString("email", loginResponse.getEmail());
-                        editor.putString("phone", loginResponse.getPhone());
-                        editor.putString("token", token);
-                        editor.putString("role", role);
-                        editor.apply();
-                        Log.d(TAG, "User data saved to SharedPreferences: Role=" + role);
-
-                        Toast.makeText(LoginActivity.this, "Login Successful! Role: " + role, Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
                     } else {
-                        Log.e(TAG, "Login failed: Response code " + response.code());
-                        if (response.errorBody() != null) {
-                            try {
-                                Log.e(TAG, "Error body: " + response.errorBody().string());
-                            } catch (Exception e) {
-                                Log.e(TAG, "Error reading errorBody: ", e);
-                            }
-                        }
-                        Toast.makeText(LoginActivity.this, "Invalid credentials or server error", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Token is null or empty");
                     }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error processing response: ", e);
-                    progressBar.setVisibility(View.GONE);
-                    btnLogin.setEnabled(true);
-                    Toast.makeText(LoginActivity.this, "Error processing login response", Toast.LENGTH_SHORT).show();
+
+                    // Save user data to SharedPreferences
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("user_id", loginResponse.getId());
+                    editor.putString("full_name", loginResponse.getFullName() != null ? loginResponse.getFullName() : "Guest");
+                    editor.putString("email", loginResponse.getEmail());
+                    editor.putString("phone", loginResponse.getPhone());
+                    editor.putString("token", token);
+                    editor.putString("role", role);
+                    editor.apply();
+                    Log.d(TAG, "User data saved to SharedPreferences: Role=" + role);
+
+                    Toast.makeText(LoginActivity.this, "Login Successful! Role: " + role, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Log.e(TAG, "Login failed: Response code " + response.code());
+                    if (response.errorBody() != null) {
+                        try {
+                            Log.e(TAG, "Error body: " + response.errorBody().string());
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error reading errorBody: ", e);
+                        }
+                    }
+                    Toast.makeText(LoginActivity.this, "Invalid credentials or server error", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                handler.removeCallbacksAndMessages(null);
                 progressBar.setVisibility(View.GONE);
                 btnLogin.setEnabled(true);
                 Log.e(TAG, "Login failed due to network or server error: ", t);
-                Toast.makeText(LoginActivity.this, "Login failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (t instanceof java.net.SocketTimeoutException && retryCount < MAX_RETRIES) {
+                    retryCount++;
+                    Log.w(TAG, "Timeout detected, retrying (" + retryCount + "/" + MAX_RETRIES + ")");
+                    performLoginWithRetry(email, password); // Thử lại
+                } else {
+                    Toast.makeText(LoginActivity.this, "Login failed: " + t.getMessage() + " (Max retries reached)", Toast.LENGTH_SHORT).show();
+                    retryCount = 0; // Reset retry count
+                }
             }
         });
     }
