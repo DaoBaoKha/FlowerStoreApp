@@ -24,4 +24,15 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="8dp" />
 
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quay về"
+        android:textColor="#FFFFFF"
+        android:background="@android:color/holo_green_dark"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:padding="8dp"/>
+
 </LinearLayout>

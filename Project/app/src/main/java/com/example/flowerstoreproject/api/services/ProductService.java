@@ -9,6 +9,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public interface ProductService {
-    @GET("products/category/{categoryId}")
+    @GET("flowers/category/{categoryId}")
     Call<List<Product>> getProductsByCategory(@Path("categoryId") String categoryId);
 }

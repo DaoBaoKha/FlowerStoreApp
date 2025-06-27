@@ -1,14 +1,17 @@
 package com.example.flowerstoreproject.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.flowerstoreproject.R;
+import com.example.flowerstoreproject.adapters.ProductAdapter;
 import com.example.flowerstoreproject.api.RetrofitClient;
 import com.example.flowerstoreproject.api.services.ProductService;
 import com.example.flowerstoreproject.model.Product;
@@ -23,9 +26,10 @@ import retrofit2.Response;
 public class ProductListActivity extends AppCompatActivity {
 
     private ListView productListView;
-    private ArrayAdapter<String> adapter;
+    private ProductAdapter adapter;
     private List<Product> products = new ArrayList<>();
     private String categoryId;
+    private Button btnBack; // Thêm biến nút quay về
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +37,21 @@ public class ProductListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_list);
 
         productListView = findViewById(R.id.productListView);
+        btnBack = findViewById(R.id.btnBack); // Gán ID cho nút quay về
 
-        // Lấy categoryId từ Intent
+        // Xử lý sự kiện bấm nút "Quay về"
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Quay về MainActivity
+                Intent intent = new Intent(ProductListActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Xoá các activity trên MainActivity nếu có
+                startActivity(intent);
+                finish(); // Đóng ProductListActivity
+            }
+        });
+
+        // Nhận categoryId từ Intent
         categoryId = getIntent().getStringExtra("categoryId");
         if (categoryId == null) {
             Toast.makeText(this, "Category ID not found", Toast.LENGTH_SHORT).show();
@@ -42,11 +59,9 @@ public class ProductListActivity extends AppCompatActivity {
             return;
         }
 
-        // Initialize ListView adapter
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
+        adapter = new ProductAdapter(this, R.layout.list_item_product, products);
         productListView.setAdapter(adapter);
 
-        // Load products
         loadProducts();
     }
 
@@ -75,12 +90,8 @@ public class ProductListActivity extends AppCompatActivity {
     }
 
     private void updateProductList() {
-        List<String> productNames = new ArrayList<>();
-        for (Product product : products) {
-            productNames.add(product.getName() + " - $" + product.getPrice());
-        }
         adapter.clear();
-        adapter.addAll(productNames);
+        adapter.addAll(products);
         adapter.notifyDataSetChanged();
     }
 }
