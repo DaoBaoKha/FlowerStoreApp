@@ -6,6 +6,7 @@ public class LoginResponse {
     private String email;
     private String phone;
     private String token;
+    private String role;
 
     // Getters and Setters
     public String getId() {
@@ -46,5 +47,13 @@ public class LoginResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getRole() {
+        return role != null ? role : "User"; // Default role nếu null
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
