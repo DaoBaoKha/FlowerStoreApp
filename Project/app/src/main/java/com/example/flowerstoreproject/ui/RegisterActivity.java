@@ -1,4 +1,4 @@
-package com.example.flowerstoreproject;
+package com.example.flowerstoreproject.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +10,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.flowerstoreproject.api.AuthService;
+
+import com.example.flowerstoreproject.R;
+import com.example.flowerstoreproject.api.services.AuthService;
 import com.example.flowerstoreproject.api.RetrofitClient;
 import com.example.flowerstoreproject.model.RegisterRequest;
 import com.example.flowerstoreproject.model.RegisterResponse;

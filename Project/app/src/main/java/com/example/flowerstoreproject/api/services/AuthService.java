@@ -1,4 +1,4 @@
-package com.example.flowerstoreproject.api;
+package com.example.flowerstoreproject.api.services;
 
 import com.example.flowerstoreproject.model.LoginRequest;
 import com.example.flowerstoreproject.model.LoginResponse;
