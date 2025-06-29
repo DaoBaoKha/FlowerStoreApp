@@ -34,10 +34,6 @@
             android:name=".ui.VerifyOTPActivity"
             android:exported="false">
         </activity>
-        <activity
-            android:name=".ui.ProductListActivity"
-            android:exported="false">
-        </activity>
     </application>
 
 </manifest>

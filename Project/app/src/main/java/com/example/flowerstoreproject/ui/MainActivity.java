@@ -1,23 +1,24 @@
 package com.example.flowerstoreproject.ui;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.flowerstoreproject.R;
-import com.example.flowerstoreproject.api.services.CategoryService;
+import com.example.flowerstoreproject.adapters.CategoryAdapter;
+import com.example.flowerstoreproject.adapters.ProductAdapter;
 import com.example.flowerstoreproject.api.RetrofitClient;
+import com.example.flowerstoreproject.api.services.CategoryService;
+import com.example.flowerstoreproject.api.services.ProductService;
 import com.example.flowerstoreproject.model.Category;
+import com.example.flowerstoreproject.model.Product;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +29,13 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    private TextView tvWelcome;
-    private Button btnBrowseFlowers, btnViewOrders;
-    private ListView categoryListView;
+    private RecyclerView categoryRecyclerView, productRecyclerView;
+    private Button btnShowAll;
     private SharedPreferences sharedPreferences;
-    private ArrayAdapter<String> adapter;
+    private CategoryAdapter categoryAdapter;
+    private ProductAdapter productAdapter;
     private List<Category> categories = new ArrayList<>();
+    private List<Product> products = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,61 +43,38 @@ public class MainActivity extends AppCompatActivity {
         try {
             setContentView(R.layout.activity_main);
 
-            // Initialize views
-            tvWelcome = findViewById(R.id.tvWelcome);
-            btnBrowseFlowers = findViewById(R.id.btnBrowseFlowers);
-            btnViewOrders = findViewById(R.id.btnViewOrders);
-            categoryListView = findViewById(R.id.categoryListView);
+            // Khởi tạo views
+            categoryRecyclerView = findViewById(R.id.categoryRecyclerView);
+            productRecyclerView = findViewById(R.id.productRecyclerView);
+            btnShowAll = findViewById(R.id.btnShowAll);
 
-            // Initialize SharedPreferences
+            // Khởi tạo SharedPreferences
             sharedPreferences = getSharedPreferences("FlowerShopPrefs", MODE_PRIVATE);
 
-            // Set welcome message with user's full name
-            String fullName = sharedPreferences.getString("full_name", "Guest");
-            Log.d(TAG, "User full name: " + fullName);
-            tvWelcome.setText("Welcome, " + fullName + "!");
-
-            // Initialize ListView adapter
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
-            categoryListView.setAdapter(adapter);
-
-            // Set item click listener for categoryListView
-            categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Category selectedCategory = categories.get(position);
-                    String categoryId = selectedCategory.getId();
-                    Intent intent = new Intent(MainActivity.this, ProductListActivity.class);
-                    intent.putExtra("categoryId", categoryId);
-                    startActivity(intent);
-                }
+            // Khởi tạo RecyclerView adapters
+            categoryAdapter = new CategoryAdapter(this, categories, category -> {
+                loadProducts(category.getId()); // Tải sản phẩm theo danh mục
             });
+            categoryRecyclerView.setAdapter(categoryAdapter);
+            categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-            // Set button click listeners
-            btnBrowseFlowers.setOnClickListener(v -> {
-                Log.d(TAG, "Browse Flowers clicked");
-                // TODO: Implement navigation to flower browsing screen
-                // Intent intent = new Intent(MainActivity.this, BrowseFlowersActivity.class);
-                // startActivity(intent);
-            });
+            productAdapter = new ProductAdapter(this, products);
+            productRecyclerView.setAdapter(productAdapter);
+            productRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-            btnViewOrders.setOnClickListener(v -> {
-                Log.d(TAG, "View Orders clicked");
-                // TODO: Implement navigation to orders screen
-                // Intent intent = new Intent(MainActivity.this, ViewOrdersActivity.class);
-                // startActivity(intent);
-            });
+            // Thiết lập sự kiện click cho nút "Tất cả"
+            btnShowAll.setOnClickListener(v -> loadAllProducts());
 
-            // Load categories
+            // Tải danh mục và tất cả sản phẩm khi khởi động
             loadCategories();
+            loadAllProducts();
         } catch (Exception e) {
-            Log.e(TAG, "Error in onCreate: ", e);
-            Toast.makeText(this, "Error loading MainActivity", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Lỗi trong onCreate: ", e);
+            Toast.makeText(this, "Lỗi tải MainActivity", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void loadCategories() {
-        // Sử dụng getClient() để tạo CategoryService
         CategoryService categoryService = RetrofitClient.getClient().create(CategoryService.class);
         Call<List<Category>> call = categoryService.getCategories();
 
@@ -103,29 +82,70 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    categories = response.body();
-                    updateCategoryList();
+                    categories.clear();
+                    categories.addAll(response.body());
+                    categoryAdapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(MainActivity.this, "Failed to load categories", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Response not successful: " + response.code());
+                    Toast.makeText(MainActivity.this, "Không tải được danh mục", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Phản hồi không thành công: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Category>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Error loading categories", t);
+                Toast.makeText(MainActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Lỗi tải danh mục", t);
             }
         });
     }
 
-    private void updateCategoryList() {
-        List<String> categoryNames = new ArrayList<>();
-        for (Category category : categories) {
-            categoryNames.add(category.getName());
-        }
-        adapter.clear();
-        adapter.addAll(categoryNames);
-        adapter.notifyDataSetChanged();
+    private void loadProducts(String categoryId) {
+        ProductService productService = RetrofitClient.getClient().create(ProductService.class);
+        Call<List<Product>> call = productService.getProductsByCategory(categoryId);
+
+        call.enqueue(new Callback<List<Product>>() {
+            @Override
+            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    products.clear();
+                    products.addAll(response.body());
+                    productAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(MainActivity.this, "Không tải được sản phẩm", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Phản hồi không thành công: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Product>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Lỗi tải sản phẩm", t);
+            }
+        });
+    }
+
+    private void loadAllProducts() {
+        ProductService productService = RetrofitClient.getClient().create(ProductService.class);
+        Call<List<Product>> call = productService.getProducts();
+
+        call.enqueue(new Callback<List<Product>>() {
+            @Override
+            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    products.clear();
+                    products.addAll(response.body());
+                    productAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(MainActivity.this, "Không tải được tất cả sản phẩm", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Phản hồi không thành công: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Product>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Lỗi tải tất cả sản phẩm", t);
+            }
+        });
     }
 }
