@@ -87,14 +87,14 @@ public class MainActivity extends AppCompatActivity {
             productRecyclerView.setAdapter(productAdapter);
             productRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-            // Thiết lập sự kiện click cho nút "Tất cả"
-            btnShowAll.setOnClickListener(v -> loadAllProducts());
-
             // Thiết lập sự kiện click cho thanh taskbar
             homeLayout.setOnClickListener(v -> navigateTo(0));
             cartLayout.setOnClickListener(v -> navigateTo(1));
             ordersLayout.setOnClickListener(v -> navigateTo(2));
             profileLayout.setOnClickListener(v -> navigateTo(3));
+
+            // Thiết lập sự kiện click cho nút "Tất cả"
+            btnShowAll.setOnClickListener(v -> loadAllProducts());
 
             // Đặt Home là mặc định được chọn
             updateNavigationSelection(0);

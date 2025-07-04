@@ -37,14 +37,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = products.get(position);
 
-        //holder.tvProductId.setText("ID: " + product.getId());
         holder.tvProductName.setText(product.getName());
         holder.tvProductPrice.setText("$" + product.getPrice());
         holder.tvProductDescription.setText(product.getDescription());
-        holder.tvProductCategory.setText("Danh mục: " + product.getCategory().getName());
-        //holder.tvProductStock.setText("Tồn kho: " + product.getStock());
-        //holder.tvProductIsActive.setText("Hoạt động: " + (product.isActive() ? "Có" : "Không"));
-        //holder.tvProductCreateBy.setText("Tạo bởi: " + product.getCreator().getFullName());
 
         Glide.with(context)
                 .load(product.getImage())
@@ -58,20 +53,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     static class ProductViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProductImage;
-        TextView tvProductId, tvProductName, tvProductPrice, tvProductDescription,
-                tvProductCategory, tvProductStock, tvProductIsActive, tvProductCreateBy;
+        TextView tvProductName, tvProductPrice, tvProductDescription;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
             ivProductImage = itemView.findViewById(R.id.ivProductImage);
-            //tvProductId = itemView.findViewById(R.id.tvProductId);
             tvProductName = itemView.findViewById(R.id.tvProductName);
             tvProductPrice = itemView.findViewById(R.id.tvProductPrice);
             tvProductDescription = itemView.findViewById(R.id.tvProductDescription);
-            tvProductCategory = itemView.findViewById(R.id.tvProductCategory);
-            //tvProductStock = itemView.findViewById(R.id.tvProductStock);
-            //tvProductIsActive = itemView.findViewById(R.id.tvProductIsActive);
-            //tvProductCreateBy = itemView.findViewById(R.id.tvProductCreateBy);
         }
     }
 }
