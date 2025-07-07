@@ -27,6 +27,7 @@ import com.example.flowerstoreproject.api.services.ProductService;
 import com.example.flowerstoreproject.model.Category;
 import com.example.flowerstoreproject.model.Product;
 import com.example.flowerstoreproject.model.Profile;
+import com.example.flowerstoreproject.utils.CartManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Product> products = new ArrayList<>();
     private LinearLayout homeLayout, cartLayout, ordersLayout, profileLayout;
     private ImageView homeIcon, cartIcon, ordersIcon, profileIcon;
-    private TextView homeText, cartText, ordersText, profileText;
+    private TextView homeText, cartText, ordersText, profileText, cartBadge; // Đã khai báo cartBadge
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
             cartText = findViewById(R.id.cart_text);
             ordersText = findViewById(R.id.orders_text);
             profileText = findViewById(R.id.profile_text);
+            cartBadge = findViewById(R.id.cart_badge); // Thêm khởi tạo cartBadge
 
             // Khởi tạo SharedPreferences
             sharedPreferences = getSharedPreferences("FlowerShopPrefs", MODE_PRIVATE);
@@ -83,7 +85,12 @@ public class MainActivity extends AppCompatActivity {
             categoryRecyclerView.setAdapter(categoryAdapter);
             categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-            productAdapter = new ProductAdapter(this, products);
+            // Trong onCreate của MainActivity
+            productAdapter = new ProductAdapter(this, products, product -> {
+                CartManager.getInstance().addToCart(product);
+                updateCartBadge(); // Cập nhật badge khi thêm vào giỏ
+            });
+
             productRecyclerView.setAdapter(productAdapter);
             productRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -271,5 +278,18 @@ public class MainActivity extends AppCompatActivity {
                 profileLayout.setBackgroundColor(selectedBackground);
                 break;
         }
+    }
+
+    // Phương thức để cập nhật badge trên icon giỏ hàng
+    private void updateCartBadge() {
+        runOnUiThread(() -> {
+            int count = CartManager.getInstance().getCartItemCount();
+            if (count > 0) {
+                cartBadge.setText(String.valueOf(count));
+                cartBadge.setVisibility(View.VISIBLE);
+            } else {
+                cartBadge.setVisibility(View.GONE);
+            }
+        });
     }
 }

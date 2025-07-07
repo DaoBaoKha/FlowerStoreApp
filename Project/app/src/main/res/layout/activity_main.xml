@@ -129,6 +129,9 @@
     <include
         android:id="@+id/bottom_navigation"
         layout="@layout/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" />
+
 
 </RelativeLayout>
