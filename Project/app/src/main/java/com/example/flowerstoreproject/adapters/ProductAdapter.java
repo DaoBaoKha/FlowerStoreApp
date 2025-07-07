@@ -4,8 +4,10 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,10 +22,18 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     private final Context context;
     private final List<Product> products;
+    private final OnAddToCartListener listener; // Interface để thông báo khi thêm vào giỏ
 
-    public ProductAdapter(Context context, List<Product> products) {
+    // Interface để thông báo khi nhấn nút "Thêm vào giỏ"
+    public interface OnAddToCartListener {
+        void onAddToCart(Product product);
+    }
+
+    // Cập nhật constructor để nhận OnAddToCartListener
+    public ProductAdapter(Context context, List<Product> products, OnAddToCartListener listener) {
         this.context = context;
         this.products = products;
+        this.listener = listener; // Gán giá trị từ tham số
     }
 
     @NonNull
@@ -44,6 +54,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         Glide.with(context)
                 .load(product.getImage())
                 .into(holder.ivProductImage);
+
+        // Thiết lập sự kiện nhấp vào nút "Thêm vào giỏ"
+        holder.btnAddToCart.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onAddToCart(product);
+                Toast.makeText(context, product.getName() + " đã được thêm vào giỏ", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -54,6 +72,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     static class ProductViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProductImage;
         TextView tvProductName, tvProductPrice, tvProductDescription;
+        Button btnAddToCart;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -61,6 +80,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvProductName = itemView.findViewById(R.id.tvProductName);
             tvProductPrice = itemView.findViewById(R.id.tvProductPrice);
             tvProductDescription = itemView.findViewById(R.id.tvProductDescription);
+            btnAddToCart = itemView.findViewById(R.id.btnAddToCart); // Thêm tham chiếu đến Button
         }
     }
 }
