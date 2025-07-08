@@ -1,12 +1,17 @@
 package com.example.flowerstoreproject.ui;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,20 +36,48 @@ public class CartActivity extends AppCompatActivity {
     private RecyclerView cartRecyclerView;
     private CartAdapter cartAdapter;
     private Button btnCheckout;
+    private LinearLayout homeLayout, cartLayout, ordersLayout, profileLayout;
+    private TextView homeText, cartText, ordersText, profileText, cartBadge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
+        // Khởi tạo views
         cartRecyclerView = findViewById(R.id.cartRecyclerView);
         btnCheckout = findViewById(R.id.btnPlaceOrder);
 
+        // Khởi tạo thanh taskbar
+        homeLayout = findViewById(R.id.home_layout);
+        cartLayout = findViewById(R.id.cart_layout);
+        ordersLayout = findViewById(R.id.orders_layout);
+        profileLayout = findViewById(R.id.profile_layout);
+        homeText = findViewById(R.id.home_text);
+        cartText = findViewById(R.id.cart_text);
+        ordersText = findViewById(R.id.orders_text);
+        profileText = findViewById(R.id.profile_text);
+        cartBadge = findViewById(R.id.cart_badge);
+
+        // Thiết lập RecyclerView
         cartAdapter = new CartAdapter(this);
         cartRecyclerView.setAdapter(cartAdapter);
         cartRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Cập nhật badge giỏ hàng
+        updateCartBadge();
+
+        // Thiết lập sự kiện click cho nút Checkout
         btnCheckout.setOnClickListener(v -> createOrder());
+
+        // Thiết lập sự kiện click cho thanh taskbar
+        homeLayout.setOnClickListener(v -> navigateTo(0));
+        cartLayout.setOnClickListener(v -> navigateTo(1));
+        ordersLayout.setOnClickListener(v -> navigateTo(2));
+        profileLayout.setOnClickListener(v -> navigateTo(3));
+
+        // Đặt Cart là mặc định được chọn
+        updateNavigationSelection(1);
     }
 
     private void createOrder() {
@@ -82,6 +115,7 @@ public class CartActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     Toast.makeText(CartActivity.this, "Tạo đơn hàng thành công", Toast.LENGTH_SHORT).show();
                     CartManager.getInstance().clearCart();
+                    updateCartBadge(); // Cập nhật badge sau khi xóa giỏ hàng
                     finish(); // quay lại màn hình trước
                 } else {
                     Toast.makeText(CartActivity.this, "Tạo đơn thất bại: " + response.code(), Toast.LENGTH_SHORT).show();
@@ -95,5 +129,69 @@ public class CartActivity extends AppCompatActivity {
                 Log.e("CartActivity", "Lỗi mạng khi tạo đơn", t);
             }
         });
+    }
+
+    private void navigateTo(int position) {
+        Intent intent = null;
+        switch (position) {
+            case 0: // Home
+                intent = new Intent(this, MainActivity.class);
+                break;
+            case 1: // Cart
+                return; // Ở lại trang Cart
+            case 2: // Orders
+                intent = new Intent(this, OrdersActivity.class);
+                break;
+            case 3: // Profile
+                intent = new Intent(this, ProfileActivity.class);
+                break;
+        }
+        if (intent != null) {
+            startActivity(intent);
+            updateNavigationSelection(position);
+            overridePendingTransition(R.drawable.slide_in_right, R.drawable.slide_out_left);
+        }
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private void updateNavigationSelection(int position) {
+        int defaultBackground = android.R.color.transparent;
+        int selectedBackground = ContextCompat.getColor(this, R.color.gray_light);
+
+        homeLayout.setBackgroundColor(defaultBackground);
+        cartLayout.setBackgroundColor(defaultBackground);
+        ordersLayout.setBackgroundColor(defaultBackground);
+        profileLayout.setBackgroundColor(defaultBackground);
+
+        switch (position) {
+            case 0: // Home
+                homeLayout.setBackgroundColor(selectedBackground);
+                break;
+            case 1: // Cart
+                cartLayout.setBackgroundColor(selectedBackground);
+                break;
+            case 2: // Orders
+                ordersLayout.setBackgroundColor(selectedBackground);
+                break;
+            case 3: // Profile
+                profileLayout.setBackgroundColor(selectedBackground);
+                break;
+        }
+    }
+
+    private void updateCartBadge() {
+        int itemCount = CartManager.getInstance().getCartItems().size();
+        if (itemCount > 0) {
+            cartBadge.setText(String.valueOf(itemCount));
+            cartBadge.setVisibility(TextView.VISIBLE);
+        } else {
+            cartBadge.setVisibility(TextView.GONE);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateCartBadge(); // Cập nhật badge khi quay lại Activity
     }
 }

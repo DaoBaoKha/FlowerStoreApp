@@ -52,6 +52,34 @@
             android:exported="false">
         </activity>
 
+        <activity
+            android:name=".ui.PaymentSuccessActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="myapp"
+                    android:host="payment"
+                    android:path="/success" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.PaymentCancelActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="myapp"
+                    android:host="payment"
+                    android:path="/cancel" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
