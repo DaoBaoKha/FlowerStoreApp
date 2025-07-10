@@ -120,32 +120,54 @@ public class OrdersActivity extends AppCompatActivity {
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("orderId", orderId);
-        requestBody.put("returnUrl", "myapp://payment/success");
-        requestBody.put("cancelUrl", "myapp://payment/cancel");
+        //requestBody.put("toAccount", "6860b813b1ab60c68d7150f8");
+        requestBody.put("returnUrl", "https://prm392-finalproject.onrender.com/api/payments/payment/success");
+        requestBody.put("cancelUrl", "https://prm392-finalproject.onrender.com/api/payments/payment/cancel");
+
+        Log.d("PAYMENT_REQUEST", "Sending request to create link with body: " + requestBody);
 
         paymentService.createPaymentLink("Bearer " + token, requestBody)
                 .enqueue(new Callback<PaymentResponse>() {
                     @Override
                     public void onResponse(Call<PaymentResponse> call, Response<PaymentResponse> response) {
-                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                            String checkoutUrl = response.body().getData().getCheckoutUrl();
-                            if (checkoutUrl != null) {
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(checkoutUrl));
-                                startActivity(browserIntent);
+                        Log.d("PAYMENT_RESPONSE", "Status code: " + response.code());
+
+                        if (response.isSuccessful() && response.body() != null) {
+                            Log.d("PAYMENT_RESPONSE", "Response body: " + response.body().toString());
+
+                            if (response.body().isSuccess()) {
+                                String checkoutUrl = response.body().getData().getCheckoutUrl();
+                                Log.d("CHECKOUT_URL", "Received checkout URL: " + checkoutUrl);
+
+                                if (checkoutUrl != null) {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(checkoutUrl));
+                                    startActivity(browserIntent);
+                                } else {
+                                    Log.e("CHECKOUT_URL", "checkoutUrl is null");
+                                    Toast.makeText(OrdersActivity.this, "Không nhận được URL thanh toán", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
-                                Toast.makeText(OrdersActivity.this, "Không nhận được URL thanh toán", Toast.LENGTH_SHORT).show();
+                                Log.e("PAYMENT_RESPONSE", "Success = false: " + response.body().getMessage());
+                                Toast.makeText(OrdersActivity.this, "Không thể tạo link thanh toán", Toast.LENGTH_SHORT).show();
                             }
                         } else {
+                            try {
+                                Log.e("PAYMENT_RESPONSE", "Error body: " + response.errorBody().string());
+                            } catch (Exception e) {
+                                Log.e("PAYMENT_RESPONSE", "Lỗi đọc errorBody: " + e.getMessage());
+                            }
                             Toast.makeText(OrdersActivity.this, "Không thể tạo link thanh toán", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<PaymentResponse> call, Throwable t) {
+                        Log.e("PAYMENT_FAILURE", "Network error: " + t.getMessage(), t);
                         Toast.makeText(OrdersActivity.this, "Lỗi khi tạo link thanh toán: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+
 
     private void navigateTo(int position) {
         Intent intent = null;

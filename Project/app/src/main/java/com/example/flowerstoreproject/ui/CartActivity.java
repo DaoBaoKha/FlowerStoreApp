@@ -4,8 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +39,7 @@ public class CartActivity extends AppCompatActivity {
     private RecyclerView cartRecyclerView;
     private CartAdapter cartAdapter;
     private Button btnCheckout;
+    private EditText etAddress;
     private LinearLayout homeLayout, cartLayout, ordersLayout, profileLayout;
     private TextView homeText, cartText, ordersText, profileText, cartBadge;
 
@@ -47,6 +51,7 @@ public class CartActivity extends AppCompatActivity {
         // Khởi tạo views
         cartRecyclerView = findViewById(R.id.cartRecyclerView);
         btnCheckout = findViewById(R.id.btnPlaceOrder);
+        etAddress = findViewById(R.id.etAddress); // Thêm EditText cho địa chỉ
 
         // Khởi tạo thanh taskbar
         homeLayout = findViewById(R.id.home_layout);
@@ -70,6 +75,21 @@ public class CartActivity extends AppCompatActivity {
         // Thiết lập sự kiện click cho nút Checkout
         btnCheckout.setOnClickListener(v -> createOrder());
 
+        // Kiểm tra và kích hoạt nút Checkout dựa trên địa chỉ
+        etAddress.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                enableCheckoutButton();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+        enableCheckoutButton(); // Kiểm tra ban đầu
+
         // Thiết lập sự kiện click cho thanh taskbar
         homeLayout.setOnClickListener(v -> navigateTo(0));
         cartLayout.setOnClickListener(v -> navigateTo(1));
@@ -80,12 +100,28 @@ public class CartActivity extends AppCompatActivity {
         updateNavigationSelection(1);
     }
 
+    private void enableCheckoutButton() {
+        boolean isAddressValid = !etAddress.getText().toString().trim().isEmpty();
+        btnCheckout.setEnabled(isAddressValid);
+        if (!isAddressValid) {
+            btnCheckout.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.gray_light)); // Màu xám khi vô hiệu
+        } else {
+            btnCheckout.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.category_item_text_normal)); // Màu xanh khi kích hoạt
+        }
+    }
+
     private void createOrder() {
         SharedPreferences sharedPreferences = getSharedPreferences("FlowerShopPrefs", MODE_PRIVATE);
         String token = sharedPreferences.getString("token", null);
 
         if (token == null) {
             Toast.makeText(this, "Bạn cần đăng nhập trước khi đặt hàng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String address = etAddress.getText().toString().trim();
+        if (address.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập địa chỉ giao hàng", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -101,8 +137,8 @@ public class CartActivity extends AppCompatActivity {
         }
 
         OrderRequest orderRequest = new OrderRequest(
-                "123 Main St, City, Country",
-                10.99,
+                address, // Sử dụng địa chỉ nhập từ người dùng
+                100, // Giá trị tạm thời, cần tính toán thực tế
                 orderItems
         );
 
