@@ -1,9 +1,8 @@
 package com.example.flowerstoreproject.model;
 
 import com.google.gson.annotations.SerializedName;
-import java.util.List;
 
-public class OrderListResponse {
+public class UpdateOrderStatusResponse {
     @SerializedName("success")
     private boolean success;
 
@@ -11,7 +10,7 @@ public class OrderListResponse {
     private String message;
 
     @SerializedName("data")
-    private List<Order> data;
+    private Order data;
 
     public boolean isSuccess() {
         return success;
@@ -29,11 +28,11 @@ public class OrderListResponse {
         this.message = message;
     }
 
-    public List<Order> getData() {
+    public Order getData() {
         return data;
     }
 
-    public void setData(List<Order> data) {
+    public void setData(Order data) {
         this.data = data;
     }
 }
