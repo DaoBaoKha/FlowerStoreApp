@@ -36,6 +36,10 @@
             android:name=".ui.VerifyOTPActivity"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".ui.AdminDashboardActivity"
+            android:exported="false">
+        </activity>
 
         <activity
             android:name=".ui.ProfileActivity"

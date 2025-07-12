@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@drawable/baseline_dashboard_24"
+        android:title="Dashboard"/>
+
+    <item
+        android:id="@+id/nav_flowers"
+        android:icon="@drawable/ic_flower_empty"
+        android:title="Flowers"/>
+
+    <item
+        android:id="@+id/nav_categories"
+        android:icon="@drawable/ic_category"
+        android:title="Categories"/>
+
+    <item
+        android:id="@+id/nav_account"
+        android:icon="@drawable/profile_icon"
+        android:title="Order"/>
+</menu>

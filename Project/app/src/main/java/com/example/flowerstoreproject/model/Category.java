@@ -69,4 +69,8 @@ public class Category {
     public void setVersion(int version) {
         this.version = version;
     }
+    @Override
+    public String toString() {
+        return name; // hoặc getName() nếu field là private
+    }
 }
