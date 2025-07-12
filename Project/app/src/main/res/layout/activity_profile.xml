@@ -104,6 +104,23 @@
             android:stateListAnimator="@null"
             android:layout_gravity="center"
             android:gravity="center"/>
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Đăng Xuất"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:background="#FF6F61"
+            android:padding="16dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#FF6F61"
+            android:backgroundTintMode="src_in"
+            android:stateListAnimator="@null"
+            android:layout_gravity="center"
+            android:gravity="center"/>
+
     </LinearLayout>
 
     <!-- Include Bottom Navigation -->

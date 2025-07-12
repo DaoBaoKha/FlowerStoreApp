@@ -165,11 +165,15 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d(TAG, "onResponse: User data saved to SharedPreferences: Role=" + role);
 
                     Toast.makeText(LoginActivity.this, "Login Successful! Role: " + role, Toast.LENGTH_SHORT).show();
-                    if(role.equals("admin")){
-                        Intent intent = new Intent(LoginActivity.this, com.example.flowerstoreproject.ui.AdminDashboardActivity.class);
+                    if (role.equals("admin")) {
+                        Intent intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
                         startActivity(intent);
                         finish();
-                    }else {
+                    } else if (role.equals("shipper")) {
+                        Intent intent = new Intent(LoginActivity.this, ShipperActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();

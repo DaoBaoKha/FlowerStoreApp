@@ -30,7 +30,7 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
     private EditText etFullName, etEmail, etPhone;
     private ImageView ivAvatar;
-    private Button btnSave;
+    private Button btnSave, btnLogout;
     private SharedPreferences sharedPreferences;
     private LinearLayout homeLayout, cartLayout, ordersLayout, profileLayout;
     private ImageView homeIcon, cartIcon, ordersIcon, profileIcon;
@@ -47,6 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.etPhone);
         ivAvatar = findViewById(R.id.ivAvatar);
         btnSave = findViewById(R.id.btnSave);
+        btnLogout = findViewById(R.id.btnLogout); // Khởi tạo nút Logout
 
         // Khởi tạo thanh taskbar
         homeLayout = findViewById(R.id.home_layout);
@@ -82,8 +83,9 @@ public class ProfileActivity extends AppCompatActivity {
                     .into(ivAvatar);
         }
 
-        // Thiết lập sự kiện click cho nút Save
+        // Thiết lập sự kiện click cho các nút
         btnSave.setOnClickListener(v -> saveProfile());
+        btnLogout.setOnClickListener(v -> logout()); // Thêm sự kiện cho nút Logout
 
         // Thiết lập sự kiện click cho thanh taskbar
         homeLayout.setOnClickListener(v -> navigateTo(0));
@@ -141,6 +143,27 @@ public class ProfileActivity extends AppCompatActivity {
                 Log.e(TAG, "Lỗi cập nhật profile", t);
             }
         });
+    }
+
+    private void logout() {
+        // Xóa thông tin người dùng khỏi SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("token");
+        editor.remove("full_name");
+        editor.remove("email");
+        editor.remove("phone");
+        editor.apply();
+
+        // Hiển thị thông báo đăng xuất
+        Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+
+        // Chuyển hướng về LoginActivity
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK); // Xóa stack hoạt động
+        startActivity(intent);
+        updateNavigationSelection(0); // Chọn tab Home (có thể bỏ nếu LoginActivity không có taskbar)
+        overridePendingTransition(R.drawable.slide_in_right, R.drawable.slide_out_left);
+        finish(); // Đóng ProfileActivity
     }
 
     private void navigateTo(int position) {
