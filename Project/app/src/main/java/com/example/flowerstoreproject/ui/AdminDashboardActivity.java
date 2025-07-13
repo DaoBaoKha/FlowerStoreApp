@@ -16,6 +16,7 @@ import com.example.flowerstoreproject.R;
 import com.example.flowerstoreproject.fragment.AdminCategoriesFragment;
 import com.example.flowerstoreproject.fragment.AdminFlowersFragment;
 import com.example.flowerstoreproject.fragment.AdminOrdersFragment;
+import com.example.flowerstoreproject.fragment.AdminShippersFragment; // Thêm import
 import com.example.flowerstoreproject.ui.LoginActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -51,9 +52,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onNavigationItemSelected);
 
-        // Load fragment mặc định (Flowers)
+        // Load fragment mặc định (Dashboard)
         if (savedInstanceState == null) {
-            loadFragment(new AdminFlowersFragment());
+            loadFragment(new AdminFlowersFragment()); // Hoặc AdminOrdersFragment nếu muốn
             bottomNavigationView.setSelectedItemId(R.id.nav_flowers);
         }
     }
@@ -61,19 +62,20 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment fragment = null;
 
-        if (item.getItemId() == R.id.nav_flowers) {
+        if (item.getItemId() == R.id.nav_dashboard) {
+            // TODO: Implement AdminDashboardFragment
+            Log.d(TAG, "onNavigationItemSelected: Dashboard selected");
+        } else if (item.getItemId() == R.id.nav_flowers) {
             fragment = new AdminFlowersFragment();
             Log.d(TAG, "onNavigationItemSelected: Flowers management selected");
         } else if (item.getItemId() == R.id.nav_categories) {
             fragment = new AdminCategoriesFragment();
             Log.d(TAG, "onNavigationItemSelected: Categories management selected");
-        } else if (item.getItemId() == R.id.nav_dashboard) {
-            // TODO: Implement AdminDashboardFragment
-            // fragment = new AdminDashboardFragment();
-            Log.d(TAG, "onNavigationItemSelected: Dashboard selected");
+        } else if (item.getItemId() == R.id.nav_shippers) { // Xử lý Shippers
+            fragment = new AdminShippersFragment();
+            Log.d(TAG, "onNavigationItemSelected: Shippers management selected");
         } else if (item.getItemId() == R.id.nav_account) {
-            // TODO: Implement AdminAccountFragment
-            fragment = new AdminOrdersFragment();
+            fragment = new AdminOrdersFragment(); // Sử dụng OrdersFragment cho Account
             Log.d(TAG, "onNavigationItemSelected: Account selected");
         }
 
@@ -93,12 +95,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void redirectToLogin() {
-        // Xóa dữ liệu đăng nhập
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
 
-        // Chuyển về login
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -107,7 +107,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Xử lý back press - có thể hiển thị dialog xác nhận đăng xuất
         super.onBackPressed();
     }
 }

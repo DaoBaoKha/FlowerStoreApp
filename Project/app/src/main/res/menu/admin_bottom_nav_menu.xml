@@ -16,7 +16,12 @@
         android:title="Categories"/>
 
     <item
+        android:id="@+id/nav_shippers"
+        android:icon="@drawable/profile_icon"
+        android:title="Shippers" />
+
+    <item
         android:id="@+id/nav_account"
         android:icon="@drawable/profile_icon"
-        android:title="Order"/>
+        android:title="Account"/> <!-- Sửa lại từ "Order" thành "Account" để nhất quán -->
 </menu>
