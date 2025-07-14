@@ -61,5 +61,5 @@
         android:enabled="false" />
 
     <!-- Include Bottom Navigation -->
-    <include layout="@layout/bottom_navigation" />
+    <include layout="@layout/bottom_navigation" android:id="@+id/bottom_navigation"/>
 </LinearLayout>
