@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -81,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
             // Khởi tạo RecyclerView adapters
             categoryAdapter = new CategoryAdapter(this, categories, category -> {
                 loadProducts(category.getId()); // Tải sản phẩm theo danh mục
+                categoryAdapter.setActiveCategory(category.getId());
+                btnShowAll.setSelected(false);
+                btnShowAll.setBackgroundResource(R.drawable.rounded_background); // Use default button background
+                btnShowAll.setTextColor(ContextCompat.getColor(this, R.color.black));
             });
             categoryRecyclerView.setAdapter(categoryAdapter);
             categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -92,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             productRecyclerView.setAdapter(productAdapter);
-            productRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            productRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
             // Thiết lập sự kiện click cho thanh taskbar
             homeLayout.setOnClickListener(v -> navigateTo(0));
@@ -101,7 +106,18 @@ public class MainActivity extends AppCompatActivity {
             profileLayout.setOnClickListener(v -> navigateTo(3));
 
             // Thiết lập sự kiện click cho nút "Tất cả"
-            btnShowAll.setOnClickListener(v -> loadAllProducts());
+            btnShowAll.setOnClickListener(v -> {
+                loadAllProducts();
+                categoryAdapter.setActiveCategory(null);
+                btnShowAll.setSelected(true);
+                btnShowAll.setBackgroundResource(R.drawable.rounded_background); // Active background
+                btnShowAll.setTextColor(ContextCompat.getColor(this, R.color.category_item_text_selected)); // #FFFFFF
+            });
+
+            // Đặt "Tất cả" là mặc định được chọn khi khởi động
+            btnShowAll.setSelected(true);
+            btnShowAll.setBackgroundResource(R.drawable.rounded_background);
+            btnShowAll.setTextColor(ContextCompat.getColor(this, R.color.category_item_text_selected));
 
             // Đặt Home là mặc định được chọn
             updateNavigationSelection(0);
