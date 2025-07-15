@@ -3,11 +3,13 @@ package com.example.flowerstoreproject.ui;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.flowerstoreproject.R;
+import com.example.flowerstoreproject.fragment.ShipperOrdersFragment;
 
 public class ShipperActivity extends AppCompatActivity {
 
@@ -17,15 +19,25 @@ public class ShipperActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shipper);
 
         // Khởi tạo views
-        TextView tvTitle = findViewById(R.id.tvTitle);
         Button btnOpenMaps = findViewById(R.id.btnOpenMaps);
 
-        // Thiết lập tiêu đề
-        tvTitle.setText("Shipper Dashboard");
+        // fragment ShipperOrdersFragment
+        loadShipperOrdersFragment();
 
-        // Thiết lập nút Open Google Maps (placeholder)
+        // Open Google Maps
         btnOpenMaps.setOnClickListener(v -> {
-            // Placeholder, sẽ tích hợp Google Maps sau
+            // Placeholder, tích hợp Google Maps sau khi chọn đơn hàng
+            // Mở bản đồ với địa chỉ từ đơn hàng được chọn
         });
+    }
+
+    private void loadShipperOrdersFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment == null) {
+            fragment = new ShipperOrdersFragment();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, fragment);
+            transaction.commit();
+        }
     }
 }

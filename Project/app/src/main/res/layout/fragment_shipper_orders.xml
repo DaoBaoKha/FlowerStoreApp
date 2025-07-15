@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_order_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0 đơn hàng"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_orders"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_orders"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/tv_empty_message_orders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Không có đơn hàng nào."
+        android:visibility="gone"
+        android:textColor="@android:color/darker_gray"
+        android:layout_gravity="center" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar_orders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</LinearLayout>

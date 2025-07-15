@@ -28,4 +28,11 @@
         android:padding="12dp"
         android:layout_marginTop="16dp" />
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
+        android:name="com.example.flowerstoreproject.fragment.ShipperOrdersFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
 </LinearLayout>
