@@ -1,7 +1,6 @@
 package com.example.flowerstoreproject.ui;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,17 +17,9 @@ public class ShipperActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shipper);
 
-        // Khởi tạo views
-        Button btnOpenMaps = findViewById(R.id.btnOpenMaps);
-
         // fragment ShipperOrdersFragment
         loadShipperOrdersFragment();
 
-        // Open Google Maps
-        btnOpenMaps.setOnClickListener(v -> {
-            // Placeholder, tích hợp Google Maps sau khi chọn đơn hàng
-            // Mở bản đồ với địa chỉ từ đơn hàng được chọn
-        });
     }
 
     private void loadShipperOrdersFragment() {

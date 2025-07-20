@@ -14,6 +14,7 @@ public class RetrofitClient {
     private static final String BASE_URL = "https://prm392-finalproject.onrender.com/api/";
     private static final String GOOGLE_MAPS_URL = "https://maps.googleapis.com/maps/api/";
 
+    public static final String GOOGLE_API_KEY = "AIzaSyDKVRe6WPuIsGQVmZ2uiUZE3BYhvc5DGFk";
 
     public static Retrofit getClient() {
         if (retrofit == null) {
@@ -39,7 +40,14 @@ public class RetrofitClient {
 
     public static Retrofit getGoogleApiClient() {
         if (googleApiRetrofit == null) {
-            OkHttpClient client = new OkHttpClient.Builder().build();
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(logging)
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .build();
 
             googleApiRetrofit = new Retrofit.Builder()
                     .baseUrl(GOOGLE_MAPS_URL)
