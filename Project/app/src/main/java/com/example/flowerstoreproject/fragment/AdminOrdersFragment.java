@@ -134,6 +134,9 @@ public class AdminOrdersFragment extends Fragment {
                     orderList.clear();
                     orderList.addAll(response.body().getData());
                     orderAdapter.notifyDataSetChanged();
+
+                    // Apply initial filter after data is loaded
+                    applyCurrentFilter();
                 } else {
                     Log.e(TAG, "loadOrders: Failed to load orders, response code: " + response.code());
                     Toast.makeText(getContext(), "Failed to load orders", Toast.LENGTH_SHORT).show();
@@ -148,6 +151,15 @@ public class AdminOrdersFragment extends Fragment {
                 Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // Add this method to apply the current spinner selection
+    private void applyCurrentFilter() {
+        int selectedPosition = spinnerFilter.getSelectedItemPosition();
+        if (selectedPosition >= 0 && selectedPosition < statusValues.length) {
+            String selectedStatus = statusValues[selectedPosition];
+            orderAdapter.filter(selectedStatus);
+        }
     }
 
     private void showUpdateStatusDialog(Order order) {

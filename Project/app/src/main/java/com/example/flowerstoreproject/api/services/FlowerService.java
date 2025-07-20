@@ -35,10 +35,10 @@ public interface FlowerService {
 
     @PUT("flowers/{id}")
     Call<ApiResponse<Flower>> updateFlower(
-            @Header("Authorization") String token,
+            @Header("Authorization") String authToken,
             @Path("id") String id,
-            @Body FlowerUpdateRequest flowerUpdateRequest
-    );
+            @Body FlowerUpdateRequest request
+    );;
 
     @DELETE("flowers/{id}")
     Call<ApiResponse<Void>> deleteFlower(

@@ -218,32 +218,92 @@ public class AdminFlowersFragment extends Fragment implements FlowerAdapter.OnFl
     }
 
     private void updateFlower(String flowerId, FlowerUpdateRequest flowerUpdateRequest) {
+        // Validation
+        if (flowerId == null || flowerId.trim().isEmpty()) {
+            Log.e(TAG, "updateFlower: flowerId is null or empty");
+            Toast.makeText(getContext(), "Invalid flower ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (flowerUpdateRequest == null) {
+            Log.e(TAG, "updateFlower: flowerUpdateRequest is null");
+            Toast.makeText(getContext(), "Invalid update request", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (authToken == null || authToken.trim().isEmpty()) {
+            Log.e(TAG, "updateFlower: authToken is null or empty");
+            Toast.makeText(getContext(), "Authentication required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (flowerService == null) {
+            Log.e(TAG, "updateFlower: flowerService is null");
+            Toast.makeText(getContext(), "Service not initialized", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validation cho required fields (nếu có)
+        if (flowerUpdateRequest.getName() == null || flowerUpdateRequest.getName().trim().isEmpty()) {
+            Toast.makeText(getContext(), "Flower name is required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Log.d(TAG, "updateFlower: Updating flower with ID: " + flowerId);
+        Log.d(TAG, "updateFlower: Request data: " + flowerUpdateRequest.toString());
+        Log.d(TAG, "updateFlower: Auth token: " + (authToken.startsWith("Bearer ") ? authToken : "Bearer " + authToken));
+
         progressBar.setVisibility(View.VISIBLE);
 
-        Call<ApiResponse<Flower>> call = flowerService.updateFlower(authToken, String.valueOf(flowerId), flowerUpdateRequest);
-        call.enqueue(new Callback<ApiResponse<Flower>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<Flower>> call, Response<ApiResponse<Flower>> response) {
-                progressBar.setVisibility(View.GONE);
+        try {
+            // Đảm bảo authToken có format đúng
+            String token = authToken.startsWith("Bearer ") ? authToken : "Bearer " + authToken;
 
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.d(TAG, "updateFlower: Successfully updated flower");
-                    Toast.makeText(getContext(), "Flower updated successfully", Toast.LENGTH_SHORT).show();
-                    loadFlowers(); // Reload to get updated data
-                } else {
-                    Log.e(TAG, "updateFlower: Failed to update flower, response code: " + response.code());
-                    Toast.makeText(getContext(), "Failed to update flower", Toast.LENGTH_SHORT).show();
+            Call<ApiResponse<Flower>> call = flowerService.updateFlower(token, flowerId.trim(), flowerUpdateRequest);
+
+            if (call == null) {
+                Log.e(TAG, "updateFlower: Call is null");
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(getContext(), "Failed to create request", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            call.enqueue(new Callback<ApiResponse<Flower>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Flower>> call, Response<ApiResponse<Flower>> response) {
+                    progressBar.setVisibility(View.GONE);
+
+                    if (response.isSuccessful() && response.body() != null) {
+                        Log.d(TAG, "updateFlower: Successfully updated flower");
+                        Toast.makeText(getContext(), "Flower updated successfully", Toast.LENGTH_SHORT).show();
+                        loadFlowers(); // Reload to get updated data
+                    } else {
+                        String errorMessage = "Failed to update flower";
+                        if (response.errorBody() != null) {
+                            try {
+                                errorMessage = response.errorBody().string();
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error reading error body", e);
+                            }
+                        }
+                        Log.e(TAG, "updateFlower: Failed to update flower, response code: " + response.code() + ", message: " + errorMessage);
+                        Toast.makeText(getContext(), "Failed to update flower: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ApiResponse<Flower>> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                Log.e(TAG, "updateFlower: Network error", t);
-                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<ApiResponse<Flower>> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                    Log.e(TAG, "updateFlower: Network error", t);
+                    Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (Exception e) {
+            progressBar.setVisibility(View.GONE);
+            Log.e(TAG, "updateFlower: Exception in updateFlower", e);
+            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void deleteFlower(String flowerId) {
