@@ -9,7 +9,11 @@ import java.util.concurrent.TimeUnit;
 
 public class RetrofitClient {
     private static Retrofit retrofit;
+
+    private static Retrofit googleApiRetrofit;
     private static final String BASE_URL = "https://prm392-finalproject.onrender.com/api/";
+    private static final String GOOGLE_MAPS_URL = "https://maps.googleapis.com/maps/api/";
+
 
     public static Retrofit getClient() {
         if (retrofit == null) {
@@ -31,5 +35,18 @@ public class RetrofitClient {
                     .build();
         }
         return retrofit;
+    }
+
+    public static Retrofit getGoogleApiClient() {
+        if (googleApiRetrofit == null) {
+            OkHttpClient client = new OkHttpClient.Builder().build();
+
+            googleApiRetrofit = new Retrofit.Builder()
+                    .baseUrl(GOOGLE_MAPS_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(client)
+                    .build();
+        }
+        return googleApiRetrofit;
     }
 }
