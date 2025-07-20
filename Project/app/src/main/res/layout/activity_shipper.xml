@@ -17,17 +17,6 @@
         android:layout_gravity="center"
         android:layout_marginBottom="16dp" />
 
-    <Button
-        android:id="@+id/btnOpenMaps"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Open Google Maps"
-        android:textSize="16sp"
-        android:textColor="#FFFFFF"
-        android:background="#43E97B"
-        android:padding="12dp"
-        android:layout_marginTop="16dp" />
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:name="com.example.flowerstoreproject.fragment.ShipperOrdersFragment"

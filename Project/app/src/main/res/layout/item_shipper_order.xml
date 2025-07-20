@@ -3,57 +3,71 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp"
-    android:layout_marginBottom="8dp"
-    android:background="@android:drawable/divider_horizontal_bright">
+    android:padding="16dp"
+    android:background="#FFFFFF">
 
     <TextView
         android:id="@+id/tv_order_id"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Mã đơn: "
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textColor="#333333" />
 
     <TextView
         android:id="@+id/tv_customer_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:text="Khách hàng: "
+        android:textSize="14sp"
+        android:textColor="#666666" />
 
     <TextView
         android:id="@+id/tv_total_amount"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:text="Tổng tiền: "
+        android:textSize="14sp"
+        android:textColor="#666666" />
 
     <TextView
         android:id="@+id/tv_address"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:text="Địa chỉ: "
+        android:textSize="14sp"
+        android:textColor="#666666" />
 
     <TextView
         android:id="@+id/tv_order_at"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textColor="@android:color/darker_gray" />
+        android:text="Đặt lúc: "
+        android:textSize="14sp"
+        android:textColor="#666666" />
 
     <TextView
         android:id="@+id/tv_status"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Trạng thái: "
         android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textColor="#666666" />
 
     <Button
         android:id="@+id/btn_view_map"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Xem trên bản đồ"
-        android:textSize="14sp"
-        android:textColor="@android:color/white"
-        android:backgroundTint="@android:color/holo_green_dark"
         android:layout_marginTop="8dp" />
+
+    <Button
+        android:id="@+id/btn_complete_delivery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hoàn thành đơn"
+        android:layout_marginTop="8dp"
+        android:background="@color/category_item_bg_selected"
+        android:textColor="@android:color/white" />
 
 </LinearLayout>
