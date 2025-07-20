@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -14,6 +16,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FlowerStoreProject"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDKVRe6WPuIsGQVmZ2uiUZE3BYhvc5DGFk" />
+
         <activity
             android:name=".ui.MainActivity"
             android:exported="false">
@@ -87,6 +94,11 @@
                     android:host="payment"
                     android:path="/cancel" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.MapsActivity"
+            android:exported="false">
         </activity>
 
     </application>

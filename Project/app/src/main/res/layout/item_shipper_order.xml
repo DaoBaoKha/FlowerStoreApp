@@ -46,4 +46,14 @@
         android:textSize="14sp"
         android:textStyle="bold" />
 
+    <Button
+        android:id="@+id/btn_view_map"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xem trên bản đồ"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>

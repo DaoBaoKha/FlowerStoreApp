@@ -50,4 +50,8 @@ dependencies {
     implementation(libs.glide)
     annotationProcessor(libs.glide.compiler)
 
+    //google map
+    implementation(libs.maps)
+    implementation(libs.places)
+
 }

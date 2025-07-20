@@ -2,11 +2,14 @@ package com.example.flowerstoreproject.fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,7 +60,6 @@ public class ShipperOrdersFragment extends Fragment {
         sharedPreferences = requireActivity().getSharedPreferences("FlowerShopPrefs", MODE_PRIVATE);
 
         progressBarOrders.setVisibility(View.VISIBLE);
-
         loadAssignedOrders();
 
         swipeRefreshOrders.setOnRefreshListener(() -> loadAssignedOrders());
@@ -139,6 +141,12 @@ public class ShipperOrdersFragment extends Fragment {
             }
 
             holder.tvStatus.setText("Trạng thái: " + order.getStatus());
+
+            // mở Google Maps
+            holder.btnViewMap.setOnClickListener(v -> {
+                String address = order.getAddressShip();
+                openMapWithAddress(address);
+            });
         }
 
         @Override
@@ -146,8 +154,22 @@ public class ShipperOrdersFragment extends Fragment {
             return orderList.size();
         }
 
+        // ✅ Hàm mở Google Maps với địa chỉ
+        private void openMapWithAddress(String address) {
+            String mapUri = "http://maps.google.com/maps?q=" + address.replace(" ", "+");
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mapUri));
+            intent.setPackage("com.google.android.apps.maps");
+
+            if (intent.resolveActivity(ShipperOrdersFragment.this.requireActivity().getPackageManager()) != null) {
+                ShipperOrdersFragment.this.startActivity(intent);
+            } else {
+                Toast.makeText(getContext(), "Không tìm thấy ứng dụng Google Maps", Toast.LENGTH_SHORT).show();
+            }
+        }
+
         public class OrderViewHolder extends RecyclerView.ViewHolder {
             TextView tvOrderId, tvCustomerName, tvTotalAmount, tvAddress, tvOrderAt, tvStatus;
+            Button btnViewMap;
 
             public OrderViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -157,6 +179,7 @@ public class ShipperOrdersFragment extends Fragment {
                 tvAddress = itemView.findViewById(R.id.tv_address);
                 tvOrderAt = itemView.findViewById(R.id.tv_order_at);
                 tvStatus = itemView.findViewById(R.id.tv_status);
+                btnViewMap = itemView.findViewById(R.id.btn_view_map);
             }
         }
     }
