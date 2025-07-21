@@ -54,4 +54,6 @@ dependencies {
     implementation(libs.maps)
     implementation(libs.places)
 
+    //camera
+    implementation(libs.core)
 }
