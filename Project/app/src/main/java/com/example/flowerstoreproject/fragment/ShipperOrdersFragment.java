@@ -6,9 +6,11 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +36,7 @@ import com.example.flowerstoreproject.api.services.ShipperService;
 import com.example.flowerstoreproject.model.Order;
 import com.example.flowerstoreproject.ui.MapActivity;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,10 +59,10 @@ public class ShipperOrdersFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshOrders;
     private SharedPreferences sharedPreferences;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private Uri imageUri;
-    private String currentOrderId; // Lưu tạm orderId để xử lý sau khi chụp ảnh
-    private static final String TAG = "ShipperOrdersFragment";
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+    private String currentOrderId;
+    private static final String TAG = "ShipperOrdersFragment";
+    private Bitmap capturedBitmap;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,6 +90,14 @@ public class ShipperOrdersFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        }
+    }
+
     private void loadAssignedOrders() {
         String token = sharedPreferences.getString("token", "");
         if (token.isEmpty()) {
@@ -97,7 +107,6 @@ public class ShipperOrdersFragment extends Fragment {
             return;
         }
 
-        Log.d(TAG, "Loading orders with token: " + token.substring(0, 10) + "...");
         ShipperService shipperService = RetrofitClient.getClient().create(ShipperService.class);
         Call<List<Order>> call = shipperService.getMyOrders("Bearer " + token);
         call.enqueue(new Callback<List<Order>>() {
@@ -107,19 +116,17 @@ public class ShipperOrdersFragment extends Fragment {
                 swipeRefreshOrders.setRefreshing(false);
                 if (response.isSuccessful() && response.body() != null) {
                     List<Order> orders = response.body();
-                    Log.d(TAG, "Loaded " + orders.size() + " orders");
                     tvOrderCount.setText(orders.size() + " đơn hàng");
                     if (!orders.isEmpty()) {
                         ((OrderAdapter) recyclerOrders.getAdapter()).updateData(orders);
                         tvEmptyMessageOrders.setVisibility(View.GONE);
-                        recyclerOrders.setVisibility(View.VISIBLE); // Đảm bảo RecyclerView hiển thị
+                        recyclerOrders.setVisibility(View.VISIBLE);
                     } else {
                         tvEmptyMessageOrders.setVisibility(View.VISIBLE);
                         recyclerOrders.setVisibility(View.GONE);
                     }
                 } else {
-                    Log.e(TAG, "Failed to load orders. Code: " + response.code());
-                    tvEmptyMessageOrders.setText("Failed to load orders. Error: " + response.code());
+                    tvEmptyMessageOrders.setText("Lỗi: " + response.code());
                     tvEmptyMessageOrders.setVisibility(View.VISIBLE);
                     recyclerOrders.setVisibility(View.GONE);
                 }
@@ -129,8 +136,7 @@ public class ShipperOrdersFragment extends Fragment {
             public void onFailure(Call<List<Order>> call, Throwable t) {
                 progressBarOrders.setVisibility(View.GONE);
                 swipeRefreshOrders.setRefreshing(false);
-                Log.e(TAG, "Error loading orders: " + t.getMessage(), t);
-                tvEmptyMessageOrders.setText("Error: " + t.getMessage());
+                tvEmptyMessageOrders.setText("Lỗi: " + t.getMessage());
                 tvEmptyMessageOrders.setVisibility(View.VISIBLE);
                 recyclerOrders.setVisibility(View.GONE);
             }
@@ -141,11 +147,10 @@ public class ShipperOrdersFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
-            Log.d(TAG, "Camera result received, imageUri: " + (imageUri != null ? imageUri.toString() : "null"));
-            if (imageUri != null) {
+            Bundle extras = data != null ? data.getExtras() : null;
+            if (extras != null) {
+                capturedBitmap = (Bitmap) extras.get("data");
                 showConfirmationDialog();
-            } else {
-                Toast.makeText(getContext(), "Không tìm thấy ảnh", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -155,65 +160,55 @@ public class ShipperOrdersFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Camera permission granted");
                 dispatchTakePictureIntent();
             } else {
-                Log.e(TAG, "Camera permission denied");
                 Toast.makeText(getContext(), "Quyền camera bị từ chối", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private void showConfirmationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Xác nhận giao hàng");
-        builder.setMessage("Bạn đã giao hàng thành công?");
-
-        builder.setPositiveButton("Xác nhận", (dialog, which) -> {
-            Log.d(TAG, "Confirming delivery for orderId: " + currentOrderId);
-            if (imageUri != null) {
-                uploadDeliveryProof(imageUri);
-            } else {
-                Toast.makeText(getContext(), "Không tìm thấy ảnh", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
-
-        builder.show();
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xác nhận giao hàng")
+                .setMessage("Bạn đã giao hàng thành công?")
+                .setPositiveButton("Xác nhận", (dialog, which) -> {
+                    if (capturedBitmap != null) {
+                        uploadDeliveryProof(capturedBitmap);
+                    }
+                })
+                .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
-    private void uploadDeliveryProof(Uri imageUri) {
+    private void uploadDeliveryProof(Bitmap bitmap) {
         String token = sharedPreferences.getString("token", "");
         if (token.isEmpty()) {
-            Log.e(TAG, "Token is empty during upload");
             Toast.makeText(getContext(), "Không tìm thấy token xác thực", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        File file = new File(imageUri.getPath());
-        RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
-        MultipartBody.Part proofImage = MultipartBody.Part.createFormData("proofImage", file.getName(), requestFile);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+        byte[] byteArray = stream.toByteArray();
 
-        Log.d(TAG, "Uploading proof for orderId: " + currentOrderId);
+        RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), byteArray);
+        MultipartBody.Part proofImage = MultipartBody.Part.createFormData("proofImage", "delivery.jpg", requestFile);
+
         ShipperService shipperService = RetrofitClient.getClient().create(ShipperService.class);
         Call<Void> call = shipperService.completeDelivery("Bearer " + token, currentOrderId, proofImage);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Log.d(TAG, "Delivery completed successfully");
                     Toast.makeText(getContext(), "Hoàn thành đơn hàng thành công", Toast.LENGTH_SHORT).show();
-                    loadAssignedOrders(); // Tải lại danh sách đơn hàng
+                    loadAssignedOrders();
                 } else {
-                    Log.e(TAG, "Failed to complete delivery. Code: " + response.code());
                     Toast.makeText(getContext(), "Lỗi: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Log.e(TAG, "Error uploading proof: " + t.getMessage(), t);
                 Toast.makeText(getContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -222,30 +217,10 @@ public class ShipperOrdersFragment extends Fragment {
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (Exception e) {
-                Log.e(TAG, "Error creating image file", e);
-                Toast.makeText(getContext(), "Lỗi khi tạo file ảnh", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (photoFile != null) {
-                imageUri = Uri.fromFile(photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         } else {
-            Log.e(TAG, "No camera app available");
             Toast.makeText(getContext(), "Không tìm thấy ứng dụng camera", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private File createImageFile() throws Exception {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = requireActivity().getExternalFilesDir(null);
-        return File.createTempFile(imageFileName, ".jpg", storageDir);
     }
 
     private class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
@@ -278,22 +253,19 @@ public class ShipperOrdersFragment extends Fragment {
                 Date orderAt = isoFormat.parse(order.getOrderAt());
                 holder.tvOrderAt.setText("Đặt lúc: " + displayFormat.format(orderAt));
             } catch (ParseException e) {
-                Log.e(TAG, "Error parsing date for order " + order.getId(), e);
                 holder.tvOrderAt.setText("Đặt lúc: Không hợp lệ");
             }
 
             holder.tvStatus.setText("Trạng thái: " + order.getStatus());
 
             holder.btnViewMap.setOnClickListener(v -> {
-                Log.d(TAG, "View map clicked for order: " + order.getId());
                 Intent intent = new Intent(getContext(), MapActivity.class);
                 intent.putExtra("destinationAddress", order.getAddressShip());
                 startActivity(intent);
             });
 
             holder.btnCompleteDelivery.setOnClickListener(v -> {
-                Log.d(TAG, "Complete delivery clicked for order: " + order.getId());
-                currentOrderId = order.getId(); // Lưu orderId hiện tại
+                currentOrderId = order.getId();
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
                 } else {
