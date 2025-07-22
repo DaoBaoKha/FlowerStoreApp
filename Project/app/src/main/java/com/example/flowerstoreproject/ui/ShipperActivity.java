@@ -1,34 +1,36 @@
 package com.example.flowerstoreproject.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.flowerstoreproject.ui.LoginActivity;
 import com.example.flowerstoreproject.R;
 import com.example.flowerstoreproject.fragment.ShipperOrdersFragment;
 
 public class ShipperActivity extends AppCompatActivity {
+
+    private Button btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shipper);
 
-        // Khởi tạo views
-        Button btnOpenMaps = findViewById(R.id.btnOpenMaps);
-
-        // fragment ShipperOrdersFragment
-        loadShipperOrdersFragment();
-
-        // Open Google Maps
-        btnOpenMaps.setOnClickListener(v -> {
-            // Placeholder, tích hợp Google Maps sau khi chọn đơn hàng
-            // Mở bản đồ với địa chỉ từ đơn hàng được chọn
+        btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(v -> {
+            // Clear session if any (SharedPreferences etc.)
+            // Navigate to LoginActivity
+            Intent intent = new Intent(ShipperActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear backstack
+            startActivity(intent);
         });
+
+        loadShipperOrdersFragment();
     }
 
     private void loadShipperOrdersFragment() {

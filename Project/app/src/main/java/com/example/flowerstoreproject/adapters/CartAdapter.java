@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.flowerstoreproject.R;
-import com.example.flowerstoreproject.model.Product;
+import com.example.flowerstoreproject.model.CartItem;
 import com.example.flowerstoreproject.utils.CartManager;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
     private final Context context;
-    private List<Product> cartItems;
+    private List<CartItem> cartItems;
 
     public CartAdapter(Context context) {
         this.context = context;
@@ -34,15 +34,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-        Product product = cartItems.get(position);
-        holder.tvCartProductName.setText(product.getName());
-        holder.tvCartProductPrice.setText("$" + product.getPrice());
-        holder.tvCartProductQuantity.setText("Số lượng: 1"); // Hiện tại chỉ hỗ trợ 1 sản phẩm/lần
+        CartItem item = cartItems.get(position);
+        holder.tvCartProductName.setText(item.getProduct().getName());
+        holder.tvCartProductPrice.setText("$" + item.getProduct().getPrice());
+        holder.tvCartProductQuantity.setText("Quantity: " + item.getQuantity());
+
+        // Optionally: hiển thị tổng giá tiền từng dòng
+        // holder.tvCartTotalPrice.setText("$" + (item.getQuantity() * item.getProduct().getPrice()));
     }
 
     @Override
     public int getItemCount() {
-        return cartItems.size();
+        return cartItems != null ? cartItems.size() : 0;
     }
 
     public void updateCartItems() {

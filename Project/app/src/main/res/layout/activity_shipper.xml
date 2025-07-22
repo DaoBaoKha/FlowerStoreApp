@@ -8,25 +8,24 @@
 
     <TextView
         android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Shipper Dashboard"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="#388E3C"
-        android:layout_gravity="center"
-        android:layout_marginBottom="16dp" />
-
-    <Button
-        android:id="@+id/btnOpenMaps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Open Google Maps"
-        android:textSize="16sp"
-        android:textColor="#FFFFFF"
-        android:background="#43E97B"
-        android:padding="12dp"
-        android:layout_marginTop="16dp" />
+        android:text="Shipper Dashboard"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#4E342E"
+        android:gravity="center"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đăng xuất"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#F44336"
+        android:layout_gravity="end"
+        android:layout_marginBottom="12dp" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"

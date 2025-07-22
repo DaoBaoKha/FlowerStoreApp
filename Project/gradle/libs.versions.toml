@@ -14,6 +14,10 @@ swiperefreshlayout = "1.1.0"
 firebaseAppdistributionGradle = "5.1.1"
 recyclerview = "1.4.0"
 
+maps = "18.2.0"
+places = "3.4.0"
+
+core = "1.13.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -33,6 +37,10 @@ swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefre
 firebase-appdistribution-gradle = { group = "com.google.firebase", name = "firebase-appdistribution-gradle", version.ref = "firebaseAppdistributionGradle" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 
+maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "maps" }
+places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
+
+core = { group = "androidx.core", name = "core", version.ref = "core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
