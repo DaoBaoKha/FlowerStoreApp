@@ -11,17 +11,17 @@
         android:layout_width="200dp"
         android:layout_height="100dp"
         android:src="@drawable/flower_logo"
-        android:contentDescription="@string/app_name"
-        android:layout_marginBottom="24dp"/>
+        android:contentDescription="Ứng dụng cửa hàng hoa"
+        android:layout_marginBottom="24dp" />
 
     <TextView
         android:id="@+id/tvOTPMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="OTP has been sent to your email"
+        android:text="Mã OTP đã được gửi đến email của bạn"
         android:textSize="20sp"
         android:textColor="#FF4081"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,6 +29,7 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:layout_marginBottom="16dp">
+
         <EditText
             android:id="@+id/etOtp1"
             android:layout_width="40dp"
@@ -37,7 +38,8 @@
             android:inputType="number"
             android:gravity="center"
             android:background="@drawable/edit_text_background"
-            android:layout_marginEnd="4dp"/>
+            android:layout_marginEnd="4dp" />
+
         <EditText
             android:id="@+id/etOtp2"
             android:layout_width="40dp"
@@ -46,7 +48,8 @@
             android:inputType="number"
             android:gravity="center"
             android:background="@drawable/edit_text_background"
-            android:layout_marginEnd="4dp"/>
+            android:layout_marginEnd="4dp" />
+
         <EditText
             android:id="@+id/etOtp3"
             android:layout_width="40dp"
@@ -55,7 +58,8 @@
             android:inputType="number"
             android:gravity="center"
             android:background="@drawable/edit_text_background"
-            android:layout_marginEnd="4dp"/>
+            android:layout_marginEnd="4dp" />
+
         <EditText
             android:id="@+id/etOtp4"
             android:layout_width="40dp"
@@ -64,7 +68,8 @@
             android:inputType="number"
             android:gravity="center"
             android:background="@drawable/edit_text_background"
-            android:layout_marginEnd="4dp"/>
+            android:layout_marginEnd="4dp" />
+
         <EditText
             android:id="@+id/etOtp5"
             android:layout_width="40dp"
@@ -73,7 +78,8 @@
             android:inputType="number"
             android:gravity="center"
             android:background="@drawable/edit_text_background"
-            android:layout_marginEnd="4dp"/>
+            android:layout_marginEnd="4dp" />
+
         <EditText
             android:id="@+id/etOtp6"
             android:layout_width="40dp"
@@ -81,7 +87,7 @@
             android:maxLength="1"
             android:inputType="number"
             android:gravity="center"
-            android:background="@drawable/edit_text_background"/>
+            android:background="@drawable/edit_text_background" />
     </LinearLayout>
 
     <LinearLayout
@@ -97,43 +103,45 @@
         android:clickable="true"
         android:focusable="true"
         android:backgroundTintMode="src_over">
+
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:visibility="gone"
             android:indeterminateTint="#ffffff"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="VERIFY"
+            android:text="XÁC NHẬN"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"/>
+            android:textSize="20sp" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/tvResendTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Resend OTP in 01:00"
+        android:text="Gửi lại OTP sau 01:00"
         android:textSize="16sp"
         android:textColor="#212121"
         android:layout_gravity="center"
         android:visibility="gone"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/tvResendOTP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Resend OTP"
+        android:text="Gửi lại mã OTP"
         android:textColor="#0288D1"
         android:textSize="16sp"
         android:layout_gravity="center"
         android:padding="8dp"
         android:clickable="true"
         android:focusable="true"
-        android:background="?android:attr/selectableItemBackground"/>
+        android:background="?android:attr/selectableItemBackground" />
 
 </LinearLayout>
