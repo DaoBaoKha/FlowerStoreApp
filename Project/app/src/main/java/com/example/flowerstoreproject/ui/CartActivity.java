@@ -22,10 +22,10 @@ import com.example.flowerstoreproject.R;
 import com.example.flowerstoreproject.adapters.CartAdapter;
 import com.example.flowerstoreproject.api.RetrofitClient;
 import com.example.flowerstoreproject.api.services.OrderService;
+import com.example.flowerstoreproject.model.CartItem;
 import com.example.flowerstoreproject.model.CreateOrderResponse;
 import com.example.flowerstoreproject.model.OrderItem;
 import com.example.flowerstoreproject.model.OrderRequest;
-import com.example.flowerstoreproject.model.Product;
 import com.example.flowerstoreproject.utils.CartManager;
 
 import java.util.ArrayList;
@@ -48,12 +48,10 @@ public class CartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
-        // Khởi tạo views
         cartRecyclerView = findViewById(R.id.cartRecyclerView);
         btnCheckout = findViewById(R.id.btnPlaceOrder);
-        etAddress = findViewById(R.id.etAddress); // Thêm EditText cho địa chỉ
+        etAddress = findViewById(R.id.etAddress);
 
-        // Khởi tạo thanh taskbar
         homeLayout = findViewById(R.id.home_layout);
         cartLayout = findViewById(R.id.cart_layout);
         ordersLayout = findViewById(R.id.orders_layout);
@@ -64,50 +62,36 @@ public class CartActivity extends AppCompatActivity {
         profileText = findViewById(R.id.profile_text);
         cartBadge = findViewById(R.id.cart_badge);
 
-        // Thiết lập RecyclerView
         cartAdapter = new CartAdapter(this);
         cartRecyclerView.setAdapter(cartAdapter);
         cartRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Cập nhật badge giỏ hàng
         updateCartBadge();
 
-        // Thiết lập sự kiện click cho nút Checkout
         btnCheckout.setOnClickListener(v -> createOrder());
 
-        // Kiểm tra và kích hoạt nút Checkout dựa trên địa chỉ
         etAddress.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 enableCheckoutButton();
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void afterTextChanged(Editable s) {}
         });
-        enableCheckoutButton(); // Kiểm tra ban đầu
+        enableCheckoutButton();
 
-        // Thiết lập sự kiện click cho thanh taskbar
         homeLayout.setOnClickListener(v -> navigateTo(0));
         cartLayout.setOnClickListener(v -> navigateTo(1));
         ordersLayout.setOnClickListener(v -> navigateTo(2));
         profileLayout.setOnClickListener(v -> navigateTo(3));
 
-        // Đặt Cart là mặc định được chọn
         updateNavigationSelection(1);
     }
 
     private void enableCheckoutButton() {
         boolean isAddressValid = !etAddress.getText().toString().trim().isEmpty();
         btnCheckout.setEnabled(isAddressValid);
-        if (!isAddressValid) {
-            btnCheckout.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.gray_light)); // Màu xám khi vô hiệu
-        } else {
-            btnCheckout.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.category_item_text_normal)); // Màu xanh khi kích hoạt
-        }
+        btnCheckout.setBackgroundTintList(ContextCompat.getColorStateList(this,
+                isAddressValid ? R.color.category_item_text_normal : R.color.gray_light));
     }
 
     private void createOrder() {
@@ -125,22 +109,24 @@ public class CartActivity extends AppCompatActivity {
             return;
         }
 
-        List<Product> cartItems = CartManager.getInstance().getCartItems();
+        List<CartItem> cartItems = CartManager.getInstance().getCartItems();
         if (cartItems.isEmpty()) {
             Toast.makeText(this, "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
             return;
         }
 
         List<OrderItem> orderItems = new ArrayList<>();
-        for (Product product : cartItems) {
-            orderItems.add(new OrderItem(product.getId(), 1)); // mỗi sản phẩm số lượng 1
+        int totalAmount = 0;
+
+        for (CartItem cartItem : cartItems) {
+            int quantity = cartItem.getQuantity();
+            int price = cartItem.getProduct().getPrice();
+            totalAmount += price * quantity;
+
+            orderItems.add(new OrderItem(cartItem.getProduct().getId(), quantity));
         }
 
-        OrderRequest orderRequest = new OrderRequest(
-                address, // Sử dụng địa chỉ nhập từ người dùng
-                100, // Giá trị tạm thời, cần tính toán thực tế
-                orderItems
-        );
+        OrderRequest orderRequest = new OrderRequest(address, totalAmount, orderItems);
 
         OrderService orderService = RetrofitClient.getClient().create(OrderService.class);
         Call<CreateOrderResponse> call = orderService.createOrder("Bearer " + token, orderRequest);
@@ -151,8 +137,8 @@ public class CartActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     Toast.makeText(CartActivity.this, "Tạo đơn hàng thành công", Toast.LENGTH_SHORT).show();
                     CartManager.getInstance().clearCart();
-                    updateCartBadge(); // Cập nhật badge sau khi xóa giỏ hàng
-                    finish(); // quay lại màn hình trước
+                    updateCartBadge();
+                    finish();
                 } else {
                     Toast.makeText(CartActivity.this, "Tạo đơn thất bại: " + response.code(), Toast.LENGTH_SHORT).show();
                     Log.e("CartActivity", "Lỗi tạo đơn: " + response.code());
@@ -170,17 +156,10 @@ public class CartActivity extends AppCompatActivity {
     private void navigateTo(int position) {
         Intent intent = null;
         switch (position) {
-            case 0: // Home
-                intent = new Intent(this, MainActivity.class);
-                break;
-            case 1: // Cart
-                return; // Ở lại trang Cart
-            case 2: // Orders
-                intent = new Intent(this, OrdersActivity.class);
-                break;
-            case 3: // Profile
-                intent = new Intent(this, ProfileActivity.class);
-                break;
+            case 0: intent = new Intent(this, MainActivity.class); break;
+            case 1: return;
+            case 2: intent = new Intent(this, OrdersActivity.class); break;
+            case 3: intent = new Intent(this, ProfileActivity.class); break;
         }
         if (intent != null) {
             startActivity(intent);
@@ -200,25 +179,17 @@ public class CartActivity extends AppCompatActivity {
         profileLayout.setBackgroundColor(defaultBackground);
 
         switch (position) {
-            case 0: // Home
-                homeLayout.setBackgroundColor(selectedBackground);
-                break;
-            case 1: // Cart
-                cartLayout.setBackgroundColor(selectedBackground);
-                break;
-            case 2: // Orders
-                ordersLayout.setBackgroundColor(selectedBackground);
-                break;
-            case 3: // Profile
-                profileLayout.setBackgroundColor(selectedBackground);
-                break;
+            case 0: homeLayout.setBackgroundColor(selectedBackground); break;
+            case 1: cartLayout.setBackgroundColor(selectedBackground); break;
+            case 2: ordersLayout.setBackgroundColor(selectedBackground); break;
+            case 3: profileLayout.setBackgroundColor(selectedBackground); break;
         }
     }
 
     private void updateCartBadge() {
-        int itemCount = CartManager.getInstance().getCartItems().size();
-        if (itemCount > 0) {
-            cartBadge.setText(String.valueOf(itemCount));
+        int totalCount = CartManager.getInstance().getTotalItemCount();
+        if (totalCount > 0) {
+            cartBadge.setText(String.valueOf(totalCount));
             cartBadge.setVisibility(TextView.VISIBLE);
         } else {
             cartBadge.setVisibility(TextView.GONE);
@@ -228,6 +199,7 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        updateCartBadge(); // Cập nhật badge khi quay lại Activity
+        cartAdapter.notifyDataSetChanged();
+        updateCartBadge();
     }
 }
