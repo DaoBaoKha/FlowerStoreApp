@@ -14,7 +14,7 @@ public class RetrofitClient {
     private static final String BASE_URL = "https://prm392-finalproject.onrender.com/api/";
     private static final String GOOGLE_MAPS_URL = "https://maps.googleapis.com/maps/api/";
 
-    public static final String GOOGLE_API_KEY = "AIzaSyDKVRe6WPuIsGQVmZ2uiUZE3BYhvc5DGFk";
+    public static final String GOOGLE_API_KEY = "AIzaSyAwSwTDdF00hbh21k7LsX-4Htuwqm9MlPg";
 
     public static Retrofit getClient() {
         if (retrofit == null) {

@@ -10,31 +10,30 @@
     <TextView
         android:id="@+id/titleText"
         android:text="Lịch sử đơn hàng"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="#4E342E"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:gravity="center"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
 
     <!-- Danh sách đơn hàng -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ordersRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
         android:padding="8dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/titleText"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Thanh điều hướng dưới -->
     <include
