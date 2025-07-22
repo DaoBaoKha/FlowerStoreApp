@@ -36,7 +36,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItem item = cartItems.get(position);
         holder.tvCartProductName.setText(item.getProduct().getName());
-        holder.tvCartProductPrice.setText("$" + item.getProduct().getPrice());
+        holder.tvCartProductPrice.setText(item.getProduct().getPrice() + " VND");
         holder.tvCartProductQuantity.setText("Quantity: " + item.getQuantity());
 
         // Optionally: hiển thị tổng giá tiền từng dòng

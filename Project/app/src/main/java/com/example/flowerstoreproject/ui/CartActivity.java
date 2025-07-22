@@ -30,6 +30,7 @@ import com.example.flowerstoreproject.utils.CartManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -118,10 +119,13 @@ public class CartActivity extends AppCompatActivity {
         List<OrderItem> orderItems = new ArrayList<>();
         int totalAmount = 0;
 
+        Random random = new Random();
+
         for (CartItem cartItem : cartItems) {
             int quantity = cartItem.getQuantity();
             int price = cartItem.getProduct().getPrice();
-            totalAmount += price * quantity;
+            int randomAmount = 15000 + random.nextInt(30000 - 15000 + 1); // +1 để bao gồm 30000
+            totalAmount += randomAmount;
 
             orderItems.add(new OrderItem(cartItem.getProduct().getId(), quantity));
         }

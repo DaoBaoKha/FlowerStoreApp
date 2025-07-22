@@ -11,37 +11,37 @@
         android:layout_width="200dp"
         android:layout_height="100dp"
         android:src="@drawable/flower_logo"
-        android:contentDescription="@string/app_name"
-        android:layout_marginBottom="12dp"/>
+        android:contentDescription="Ứng dụng cửa hàng hoa"
+        android:layout_marginBottom="12dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Register"
+        android:text="Đăng ký"
         android:textSize="28sp"
         android:textStyle="bold"
         android:textColor="#D81B60"
-        android:layout_marginBottom="2dp"/>
+        android:layout_marginBottom="2dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Full Name"
+        android:text="Họ và tên"
         android:textSize="16sp"
         android:textColor="#D81B60"
-        android:layout_marginBottom="4dp"/>
+        android:layout_marginBottom="4dp" />
 
     <EditText
         android:id="@+id/etFullName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter your full name"
+        android:hint="Nhập họ và tên của bạn"
         android:inputType="textPersonName"
         android:padding="14dp"
         android:background="@drawable/edit_text_background"
         android:layout_marginBottom="12dp"
         android:textColor="#212121"
-        android:textColorHint="#B0BEC5"/>
+        android:textColorHint="#B0BEC5" />
 
     <TextView
         android:layout_width="match_parent"
@@ -49,59 +49,59 @@
         android:text="Email"
         android:textSize="16sp"
         android:textColor="#D81B60"
-        android:layout_marginBottom="4dp"/>
+        android:layout_marginBottom="4dp" />
 
     <EditText
         android:id="@+id/etEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter your email"
+        android:hint="Nhập email của bạn"
         android:inputType="textEmailAddress"
         android:padding="14dp"
         android:background="@drawable/edit_text_background"
         android:layout_marginBottom="12dp"
         android:textColor="#212121"
-        android:textColorHint="#B0BEC5"/>
+        android:textColorHint="#B0BEC5" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Phone"
+        android:text="Số điện thoại"
         android:textSize="16sp"
         android:textColor="#D81B60"
-        android:layout_marginBottom="4dp"/>
+        android:layout_marginBottom="4dp" />
 
     <EditText
         android:id="@+id/etPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter your phone number"
+        android:hint="Nhập số điện thoại của bạn"
         android:inputType="phone"
         android:padding="14dp"
         android:background="@drawable/edit_text_background"
         android:layout_marginBottom="12dp"
         android:textColor="#212121"
-        android:textColorHint="#B0BEC5"/>
+        android:textColorHint="#B0BEC5" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Password"
+        android:text="Mật khẩu"
         android:textSize="16sp"
         android:textColor="#D81B60"
-        android:layout_marginBottom="4dp"/>
+        android:layout_marginBottom="4dp" />
 
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter your password"
+        android:hint="Nhập mật khẩu của bạn"
         android:inputType="textPassword"
         android:padding="14dp"
         android:background="@drawable/edit_text_background"
         android:layout_marginBottom="24dp"
         android:textColor="#212121"
-        android:textColorHint="#B0BEC5"/>
+        android:textColorHint="#B0BEC5" />
 
     <LinearLayout
         android:id="@+id/btnRegister"
@@ -117,33 +117,35 @@
         android:focusable="true"
         android:backgroundTintMode="src_over"
         android:elevation="2dp">
+
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:visibility="gone"
             android:indeterminateTint="#FFFFFF"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="REGISTER"
+            android:text="ĐĂNG KÝ"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/tvLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Have an account?"
+        android:text="Đã có tài khoản?"
         android:textColor="#4CAF50"
         android:textSize="16sp"
         android:layout_gravity="center"
         android:padding="8dp"
         android:clickable="true"
         android:focusable="true"
-        android:background="?android:attr/selectableItemBackground"/>
+        android:background="?android:attr/selectableItemBackground" />
 
 </LinearLayout>
