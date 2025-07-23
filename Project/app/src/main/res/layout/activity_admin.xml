@@ -15,13 +15,18 @@
         android:elevation="4dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Admin Dashboard"
+            android:text="Flower Shop Admin Dashboard"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:singleLine="true"
+            android:ellipsize="none"
+            android:maxLines="1"
+        />
     </androidx.appcompat.widget.Toolbar>
 
     <!-- FrameLayout để chứa các fragment -->

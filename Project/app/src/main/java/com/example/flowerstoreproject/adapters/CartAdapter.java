@@ -13,7 +13,9 @@ import com.example.flowerstoreproject.R;
 import com.example.flowerstoreproject.model.CartItem;
 import com.example.flowerstoreproject.utils.CartManager;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
@@ -36,7 +38,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItem item = cartItems.get(position);
         holder.tvCartProductName.setText(item.getProduct().getName());
-        holder.tvCartProductPrice.setText("$" + item.getProduct().getPrice());
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        holder.tvCartProductPrice.setText(formatter.format(item.getProduct().getPrice()));
         holder.tvCartProductQuantity.setText("Quantity: " + item.getQuantity());
 
         // Optionally: hiển thị tổng giá tiền từng dòng

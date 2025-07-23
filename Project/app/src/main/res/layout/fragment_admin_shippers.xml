@@ -28,14 +28,6 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tv_shipper_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0 shippers"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp" />
-
         </LinearLayout>
 
         <!-- Main Content -->

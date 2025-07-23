@@ -3,11 +3,13 @@ package com.example.flowerstoreproject.fragment;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -44,7 +46,7 @@ import retrofit2.Response;
 public class AdminShippersFragment extends Fragment {
 
     private RecyclerView recyclerShippers;
-    private TextView tvShipperCount, tvEmptyMessageShippers;
+    private TextView tvEmptyMessageShippers;
     private ProgressBar progressBarShippers;
     private SwipeRefreshLayout swipeRefreshShippers;
     private SharedPreferences sharedPreferences;
@@ -54,7 +56,6 @@ public class AdminShippersFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_admin_shippers, container, false);
 
         recyclerShippers = view.findViewById(R.id.recycler_shippers);
-        tvShipperCount = view.findViewById(R.id.tv_shipper_count);
         tvEmptyMessageShippers = view.findViewById(R.id.tv_empty_message_shippers);
         progressBarShippers = view.findViewById(R.id.progress_bar_shippers);
         swipeRefreshShippers = view.findViewById(R.id.swipe_refresh_shippers);
@@ -74,7 +75,6 @@ public class AdminShippersFragment extends Fragment {
                 progressBarShippers.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
                     List<Shipper> shippers = response.body();
-                    tvShipperCount.setText(shippers.size() + " shippers");
                     if (!shippers.isEmpty()) {
                         ((ShipperAdapter) recyclerShippers.getAdapter()).updateData(shippers);
                         tvEmptyMessageShippers.setVisibility(View.GONE);
@@ -102,7 +102,6 @@ public class AdminShippersFragment extends Fragment {
                     swipeRefreshShippers.setRefreshing(false);
                     if (response.isSuccessful() && response.body() != null) {
                         List<Shipper> shippers = response.body();
-                        tvShipperCount.setText(shippers.size() + " shippers");
                         if (!shippers.isEmpty()) {
                             ((ShipperAdapter) recyclerShippers.getAdapter()).updateData(shippers);
                             tvEmptyMessageShippers.setVisibility(View.GONE);
@@ -219,13 +218,8 @@ public class AdminShippersFragment extends Fragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setTitle("Chọn Đơn Hàng để Gán");
 
-            List<String> orderStrings = new ArrayList<>();
-            for (Order order : paidOrders) {
-                String orderInfo = order.getId() + " - " + order.getAccountId().getFullName() + " (" + order.getTotalAmount() + " VND)";
-                orderStrings.add(orderInfo);
-            }
-            String[] orderArray = orderStrings.toArray(new String[0]);
-            builder.setItems(orderArray, (dialog, which) -> {
+            OrderSelectionAdapter adapter = new OrderSelectionAdapter(getContext(), paidOrders);
+            builder.setAdapter(adapter, (dialog, which) -> {
                 Order selectedOrder = paidOrders.get(which);
                 assignOrderToShipper(shipper.getId(), selectedOrder.getId());
             });
@@ -277,6 +271,30 @@ public class AdminShippersFragment extends Fragment {
                 tvVersion = itemView.findViewById(R.id.tvVersion);
                 btnAssignOrder = itemView.findViewById(R.id.btnAssignOrder);
             }
+        }
+    }
+
+    // Custom Adapter cho dialog chọn đơn hàng
+    private static class OrderSelectionAdapter extends ArrayAdapter<Order> {
+        private final List<Order> orders;
+        public OrderSelectionAdapter(Context context, List<Order> orders) {
+            super(context, 0, orders);
+            this.orders = orders;
+        }
+        @NonNull
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Order order = getItem(position);
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_order_selection, parent, false);
+            }
+            TextView tvOrderId = convertView.findViewById(R.id.tvOrderId);
+            TextView tvOrderCustomer = convertView.findViewById(R.id.tvOrderCustomer);
+            TextView tvOrderAmount = convertView.findViewById(R.id.tvOrderAmount);
+            tvOrderId.setText("Mã: " + order.getId().substring(0, 8) + "...");
+            tvOrderCustomer.setText("Khách: " + (order.getAccountId() != null ? order.getAccountId().getFullName() : ""));
+            tvOrderAmount.setText("Tổng: " + String.format("%,.0f", order.getTotalAmount()) + " VND");
+            return convertView;
         }
     }
 }

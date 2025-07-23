@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.flowerstoreproject.R;
 import com.example.flowerstoreproject.model.Order;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.OrderViewHolder> {
 
@@ -59,8 +61,9 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Or
 
         // Set order information
         holder.tvOrderId.setText("Mã đơn: " + order.getId().substring(0, 6) + "...");
-        holder.tvOrderAmount.setText("Tổng tiền: $" + String.format("%.2f", order.getTotalAmount()));
-        holder.tvShippingFee.setText("Phí ship: $" + String.format("%.2f", order.getShippingFee()));
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        holder.tvOrderAmount.setText("Tổng tiền: " + formatter.format(order.getTotalAmount()));
+        holder.tvShippingFee.setText("Phí ship: " + formatter.format(order.getShippingFee()));
         holder.tvOrderAddress.setText("Địa chỉ: " + order.getAddressShip());
         holder.tvOrderDate.setText("Ngày đặt: " + order.getOrderAt().substring(0, 10));
 

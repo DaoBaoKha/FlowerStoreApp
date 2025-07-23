@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.flowerstoreproject.R;
 import com.example.flowerstoreproject.model.Order;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
@@ -41,7 +43,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
         Order order = orders.get(position);
         holder.tvOrderId.setText("Mã đơn: " + order.getId().substring(0, 6) + "...");
-        holder.tvOrderAmount.setText("Tổng tiền: $" + order.getTotalAmount());
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        holder.tvOrderAmount.setText("Tổng tiền: " + formatter.format(order.getTotalAmount()));
         holder.tvOrderStatus.setText("Trạng thái: " + order.getStatus());
         holder.tvOrderDate.setText("Ngày đặt: " + order.getOrderAt().substring(0, 10));
 

@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_dashboard"
-        android:icon="@drawable/baseline_dashboard_24"
-        android:title="Dashboard"/>
 
     <item
         android:id="@+id/nav_flowers"
@@ -23,5 +19,5 @@
     <item
         android:id="@+id/nav_account"
         android:icon="@drawable/profile_icon"
-        android:title="Account"/> <!-- Sửa lại từ "Order" thành "Account" để nhất quán -->
+        android:title="Orders"/>
 </menu>

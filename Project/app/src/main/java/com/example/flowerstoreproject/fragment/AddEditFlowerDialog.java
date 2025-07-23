@@ -152,7 +152,10 @@ public class AddEditFlowerDialog  {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "Successfully loaded " + response.body().size() + " categories");
                     categories.clear();
-                    categories.addAll(response.body());
+                    // Lọc chỉ lấy category active
+                    for (Category c : response.body()) {
+                        if (c.isActive()) categories.add(c);
+                    }
                     categoryAdapter.notifyDataSetChanged();
 
                     // Set selected category if editing

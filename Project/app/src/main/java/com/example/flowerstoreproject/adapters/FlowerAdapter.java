@@ -51,7 +51,7 @@ public class FlowerAdapter extends RecyclerView.Adapter<FlowerAdapter.FlowerView
         holder.tvDescription.setText(flower.getDescription());
 
         // Format price
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         holder.tvPrice.setText(formatter.format(flower.getPrice()));
 
         // Set stock

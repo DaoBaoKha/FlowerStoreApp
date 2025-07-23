@@ -51,8 +51,8 @@ public class AdminOrdersFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private String authToken;
 
-    private String[] statusOptions = { "Chờ xử lý", "Đã xác nhận", "Đang giao", "Đã giao", "Đã hủy"};
-    private String[] statusValues = {"pending", "confirmed", "shipped", "delivered", "cancelled"};
+    private String[] statusOptions = { "Chờ xử lý", "Đã trả tiền", "Đã hủy", "Đã giao" };
+    private String[] statusValues = { "pending", "paid", "cancelled", "delivered" };
 
     @Nullable
     @Override
@@ -163,8 +163,8 @@ public class AdminOrdersFragment extends Fragment {
     }
 
     private void showUpdateStatusDialog(Order order) {
-        String[] statusLabels = {"Chờ xử lý", "Đã xác nhận", "Đang giao", "Đã giao", "Đã hủy"};
-        String[] statusValues = {"pending", "confirmed", "shipped", "delivered", "cancelled"};
+        String[] statusLabels = {"Chờ xử lý", "Đã trả tiền", "Đã hủy", "Đã giao"};
+        String[] statusValues = {"pending", "paid", "cancelled", "delivered"};
 
         // Find current status index
         int currentIndex = 0;

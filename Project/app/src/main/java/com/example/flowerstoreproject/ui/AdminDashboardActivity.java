@@ -102,10 +102,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment fragment = null;
 
-        if (item.getItemId() == R.id.nav_dashboard) {
-            // TODO: Implement AdminDashboardFragment
-            Log.d(TAG, "onNavigationItemSelected: Dashboard selected");
-        } else if (item.getItemId() == R.id.nav_flowers) {
+        if (item.getItemId() == R.id.nav_flowers) {
             fragment = new AdminFlowersFragment();
             Log.d(TAG, "onNavigationItemSelected: Flowers management selected");
         } else if (item.getItemId() == R.id.nav_categories) {

@@ -13,7 +13,9 @@ import com.bumptech.glide.Glide;
 import com.example.flowerstoreproject.R;
 import com.example.flowerstoreproject.model.OrderItemDetail;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.OrderItemViewHolder> {
     private List<OrderItemDetail> items;
@@ -36,8 +38,9 @@ public class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.Orde
 
         holder.tvItemName.setText(item.getFlowerId().getName());
         holder.tvItemQuantity.setText("Số lượng: " + item.getQuantity());
-        holder.tvItemPrice.setText("Giá: $" + String.format("%.2f", item.getFlowerId().getPrice()));
-        holder.tvItemTotal.setText("Tổng: $" + String.format("%.2f", item.getFlowerId().getPrice() * item.getQuantity()));
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        holder.tvItemPrice.setText("Giá: " + formatter.format(item.getFlowerId().getPrice()));
+        holder.tvItemTotal.setText("Tổng: " + formatter.format(item.getFlowerId().getPrice() * item.getQuantity()));
 
         // Load image using Glide
         if (item.getFlowerId().getImage() != null && !item.getFlowerId().getImage().isEmpty()) {

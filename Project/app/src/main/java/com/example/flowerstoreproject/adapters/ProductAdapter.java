@@ -16,7 +16,9 @@ import com.bumptech.glide.Glide;
 import com.example.flowerstoreproject.R;
 import com.example.flowerstoreproject.model.Product;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
@@ -48,7 +50,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         Product product = products.get(position);
 
         holder.tvProductName.setText(product.getName());
-        holder.tvProductPrice.setText("$" + product.getPrice());
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        holder.tvProductPrice.setText(formatter.format(product.getPrice()));
         holder.tvProductDescription.setText(product.getDescription());
 
         Glide.with(context)
