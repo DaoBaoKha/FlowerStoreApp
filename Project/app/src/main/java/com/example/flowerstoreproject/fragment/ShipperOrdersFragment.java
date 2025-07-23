@@ -258,21 +258,40 @@ public class ShipperOrdersFragment extends Fragment {
 
             holder.tvStatus.setText("Trạng thái: " + order.getStatus());
 
-            holder.btnViewMap.setOnClickListener(v -> {
-                Intent intent = new Intent(getContext(), MapActivity.class);
-                intent.putExtra("destinationAddress", order.getAddressShip());
-                startActivity(intent);
-            });
+            if (order.getStatus().equalsIgnoreCase("delivered")) {
+                // Đơn đã giao: nút map đổi màu, nút hoàn tất đổi text và disable
+                holder.btnViewMap.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), android.R.color.darker_gray));
+                holder.btnViewMap.setEnabled(false);
 
-            holder.btnCompleteDelivery.setOnClickListener(v -> {
-                currentOrderId = order.getId();
-                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
-                } else {
-                    dispatchTakePictureIntent();
-                }
-            });
+                holder.btnCompleteDelivery.setText("Đã hoàn tất");
+                holder.btnCompleteDelivery.setEnabled(false);
+                holder.btnCompleteDelivery.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), android.R.color.darker_gray));
+            } else {
+                // Đơn chưa giao: nút map và hoàn tất bình thường
+                holder.btnViewMap.setEnabled(true);
+                holder.btnViewMap.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.colorPrimary)); // "#64B5F6"
+
+                holder.btnCompleteDelivery.setEnabled(true);
+                holder.btnCompleteDelivery.setText("Hoàn tất");
+                holder.btnCompleteDelivery.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.bottom_nav_color)); // "#388E3C"
+
+                holder.btnViewMap.setOnClickListener(v -> {
+                    Intent intent = new Intent(getContext(), MapActivity.class);
+                    intent.putExtra("destinationAddress", order.getAddressShip());
+                    startActivity(intent);
+                });
+
+                holder.btnCompleteDelivery.setOnClickListener(v -> {
+                    currentOrderId = order.getId();
+                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+                    } else {
+                        dispatchTakePictureIntent();
+                    }
+                });
+            }
         }
+
 
         @Override
         public int getItemCount() {
